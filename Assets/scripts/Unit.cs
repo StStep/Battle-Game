@@ -2,25 +2,46 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider2D))]
-public class Unit : MonoBehaviour
+[RequireComponent(typeof(Collider2D), typeof(Sprite))]
+public class Unit : MonoBehaviour, ISelectable
 {
 
+    private bool selected = false;
+    private SpriteRenderer mySpriteRend;
+
     // Use this for initialization
-    void Start()
+    public void Start()
     {
-        ;
+        mySpriteRend = GetComponent<SpriteRenderer>();
+        Deselect();
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         ;
     }
 
-    void LeftClick()
+    public string Name()
     {
-        GameManager.instance.SelectItem(this.gameObject);
+        return this.gameObject.name;
+    }
+
+    public void Select()
+    {
+        selected = true;
+        mySpriteRend.color = Color.yellow;
+    }
+
+    public void Deselect()
+    {
+        selected = false;
+        mySpriteRend.color = Color.blue;
+    }
+
+    private void LeftClick()
+    {
+        GameManager.instance.SelectItem(this);
     }
 
     void OnMouseOver()

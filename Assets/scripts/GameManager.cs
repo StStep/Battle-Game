@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static GameManager instance;
 
-    public GameObject SelectedObject = null;
+    public ISelectable mSelectedObject = null;
 
     protected void Awake()
     {
@@ -32,35 +32,51 @@ public class GameManager : MonoBehaviour
     }
 
     // Use this for initialization
-    void Start()
+    public void Start()
     {
 
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
 
     }
 
-    public void SelectItem(GameObject obj)
+    public void SelectItem(ISelectable obj)
     {
-        if (obj != SelectedObject)
+        if(mSelectedObject == null)
         {
-            SelectedObject = obj;
+            mSelectedObject = obj;
+            mSelectedObject.Select();
+        }
+        else if (obj != mSelectedObject)
+        {
+            mSelectedObject.Deselect();
+            mSelectedObject = obj;
+            mSelectedObject.Select();
+        }
+        else
+        {
+            // Currently selected
+        }
+    }
+
+    public void Deselect()
+    {
+        if(mSelectedObject != null)
+        {
+            mSelectedObject.Deselect();
+            mSelectedObject = null;
         }
     }
 
     public void DebugPress()
     {
         string name = "N/A";
-        try
+        if(mSelectedObject != null)
         {
-            name = SelectedObject.name;
-        }
-        catch
-        {
-            ;
+            name = mSelectedObject.Name();
         }
         Debug.Log(string.Format("Pressed a button with {0} selected", name));
     }
