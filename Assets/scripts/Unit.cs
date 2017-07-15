@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D), typeof(Sprite))]
-public class Unit : MonoBehaviour, ISelectable
+public class Unit : MonoBehaviour, ISelectable, IClickObject
 {
-
     private bool selected = false;
     private SpriteRenderer mySpriteRend;
 
@@ -21,6 +20,8 @@ public class Unit : MonoBehaviour, ISelectable
     {
         ;
     }
+
+    ////////////////////// SELECTABLE I/F //////////////////////////////
 
     public string Name()
     {
@@ -38,17 +39,18 @@ public class Unit : MonoBehaviour, ISelectable
         selected = false;
         mySpriteRend.color = Color.blue;
     }
+    /////////////////////////////////////////////////////////////////////
 
-    private void LeftClick()
+    ////////////////////// CLICKOBJECT I/F //////////////////////////////
+
+    public void LeftClick()
     {
         GameManager.instance.SelectItem(this);
     }
 
-    void OnMouseOver()
+    public void RightClick()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            LeftClick();
-        }
+        ;
     }
+    /////////////////////////////////////////////////////////////////////
 }
