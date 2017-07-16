@@ -8,6 +8,8 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
     private bool selected = false;
     private SpriteRenderer mySpriteRend;
 
+    List<ICommandSegment> mCmdSeg = new List<ICommandSegment>();
+
     // Use this for initialization
     public void Start()
     {
@@ -21,7 +23,7 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
         ;
     }
 
-    ////////////////////// SELECTABLE I/F //////////////////////////////
+    //////////////////////// ISelectable ///////////////////////////////
 
     public string Name()
     {
@@ -41,11 +43,21 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
     }
     /////////////////////////////////////////////////////////////////////
 
-    ////////////////////// CLICKOBJECT I/F //////////////////////////////
+    //////////////////////// IClickObject ///////////////////////////////
 
     public void LeftClick()
     {
         GameManager.instance.SelectItem(this);
+
+        foreach(ICommandSegment seg in mCmdSeg)
+        {
+            seg.Remove();
+        }
+        mCmdSeg.Clear();
+        GameObject newseg = Instantiate(Resources.Load("Prefabs/UnitGhost")) as GameObject;
+        newseg.transform.position = this.gameObject.transform.position;
+        newseg.transform.parent = this.gameObject.transform;
+        mCmdSeg.Add(newseg.GetComponent<ICommandSegment>());
     }
 
     public void RightClick()
