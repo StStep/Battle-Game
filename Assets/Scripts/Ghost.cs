@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitGhost : MonoBehaviour, ICommandSegment, IClickObject
+public class Ghost : MonoBehaviour, IClickObject
 {
     private bool floating;
+    public List<ICommandSegment> mCmdSeg = new List<ICommandSegment>();
 
     // Use this for initialization
     public void Start ()
@@ -34,6 +35,19 @@ public class UnitGhost : MonoBehaviour, ICommandSegment, IClickObject
         }
 		
 	}
+
+    public void Hide()
+    {
+        enabled = false;
+        floating = false;
+    }
+
+    public void Show(Vector3 pos)
+    {
+        transform.position = pos;
+        enabled = true;
+        floating = true;
+    }
 
     //////////////////////// IClickObject ///////////////////////////////
 

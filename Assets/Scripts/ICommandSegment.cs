@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 public interface ICommandSegment
 {
@@ -9,4 +10,6 @@ public interface ICommandSegment
     int AdjustLength(int diff);
 
     void Remove();
+
+    Vector2 Start { get; set; }
 }

@@ -7,13 +7,18 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
 {
     private bool selected = false;
     private SpriteRenderer mySpriteRend;
-
-    List<ICommandSegment> mCmdSeg = new List<ICommandSegment>();
+    private Ghost myGhost;
 
     // Use this for initialization
     public void Start()
     {
         mySpriteRend = GetComponent<SpriteRenderer>();
+        this.myGhost = GetComponentInChildren(typeof(Ghost)) as Ghost;
+        if(this.myGhost == null)
+        {
+            Debug.LogError("No ghost object found.");
+        }
+        this.myGhost.Hide();
         Deselect();
     }
 
@@ -49,15 +54,7 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
     {
         GameManager.instance.SelectItem(this);
 
-        foreach(ICommandSegment seg in mCmdSeg)
-        {
-            seg.Remove();
-        }
-        mCmdSeg.Clear();
-        GameObject newseg = Instantiate(Resources.Load("Prefabs/UnitGhost")) as GameObject;
-        newseg.transform.position = this.gameObject.transform.position;
-        newseg.transform.parent = this.gameObject.transform;
-        mCmdSeg.Add(newseg.GetComponent<ICommandSegment>());
+        myGhost.Show(this.gameObject.transform.position);
     }
 
     public void RightClick()
