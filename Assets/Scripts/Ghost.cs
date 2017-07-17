@@ -5,12 +5,14 @@ using UnityEngine;
 public class Ghost : MonoBehaviour, IClickObject
 {
     private bool floating;
+    private bool rotating;
     public List<ICommandSegment> mCmdSeg = new List<ICommandSegment>();
 
     // Use this for initialization
     public void Start ()
     {
-        floating = true;
+        floating = false;
+        rotating = false;
     }
 
     // Update is called once per frame
@@ -22,19 +24,41 @@ public class Ghost : MonoBehaviour, IClickObject
             floating = false;
         }
 
+        if (Input.GetMouseButtonUp(1))
+        {
+            rotating = false;
+        }
+
         // Drag if floating
-        Vector3 mousePosition;
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if(floating)
         {
-            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position = new Vector3(mousePosition.x, mousePosition.y, transform.position.z);
+        }
+        // Rotate if rotating
+        else if (rotating)
+        {
+            // TODO Makesmoother, difference of mouse movement not absoute position
+            float x = mousePosition.x - transform.position.x;
+            float y = mousePosition.y - transform.position.y;
+            float angle = Mathf.Atan2(y, x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
         }
         else
         {
-
+            ;
         }
-		
-	}
+    }
+
+    public void Rotate()
+    {
+        rotating = true;
+    }
+
+    public void Float()
+    {
+        floating = true;
+    }
 
     public void Hide()
     {
@@ -46,7 +70,6 @@ public class Ghost : MonoBehaviour, IClickObject
     {
         transform.position = pos;
         enabled = true;
-        floating = true;
     }
 
     //////////////////////// IClickObject ///////////////////////////////
@@ -58,7 +81,7 @@ public class Ghost : MonoBehaviour, IClickObject
 
     public void RightClick()
     {
-        ;
+        rotating = true;
     }
     /////////////////////////////////////////////////////////////////////
 

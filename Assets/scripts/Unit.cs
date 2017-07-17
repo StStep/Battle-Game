@@ -54,12 +54,16 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
     {
         GameManager.instance.SelectItem(this);
 
+        myGhost.Float();
         myGhost.Show(this.gameObject.transform.position);
     }
 
     public void RightClick()
     {
-        ;
+        GameManager.instance.SelectItem(this);
+
+        myGhost.Rotate();
+        myGhost.Show(this.gameObject.transform.position);
     }
     /////////////////////////////////////////////////////////////////////
 }
