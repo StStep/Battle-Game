@@ -6,11 +6,13 @@ public class Ghost : MonoBehaviour, IClickObject
 {
     private bool floating;
     private bool rotating;
+    private SpriteRenderer mySpriteRend;
     public List<ICommandSegment> mCmdSeg = new List<ICommandSegment>();
 
     // Use this for initialization
     public void Start ()
     {
+        mySpriteRend = GetComponent<SpriteRenderer>();
         floating = false;
         rotating = false;
     }
@@ -64,12 +66,16 @@ public class Ghost : MonoBehaviour, IClickObject
     {
         enabled = false;
         floating = false;
+        rotating = false;
+        mySpriteRend.enabled = false;
     }
 
-    public void Show(Vector3 pos)
+    public void Show(Vector3 pos, Quaternion rot)
     {
         transform.position = pos;
+        transform.rotation = rot;
         enabled = true;
+        mySpriteRend.enabled = true;
     }
 
     //////////////////////// IClickObject ///////////////////////////////
