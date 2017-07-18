@@ -62,7 +62,8 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
     {
         GameManager.instance.SelectItem(this);
 
-        myGhost.Rotate();
+        Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        myGhost.Rotate(new Vector2(p.x, p.y));
         myGhost.Show(this.gameObject.transform.position, this.gameObject.transform.rotation);
     }
     /////////////////////////////////////////////////////////////////////

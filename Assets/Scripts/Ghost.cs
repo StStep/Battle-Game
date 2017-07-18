@@ -6,6 +6,7 @@ public class Ghost : MonoBehaviour, IClickObject
 {
     private bool floating;
     private bool rotating;
+    private Vector2 mouseStart;
     private SpriteRenderer mySpriteRend;
     public List<ICommandSegment> mCmdSeg = new List<ICommandSegment>();
 
@@ -41,10 +42,13 @@ public class Ghost : MonoBehaviour, IClickObject
         else if (rotating)
         {
             // TODO Makesmoother, difference of mouse movement not absoute position
+            float sx = mouseStart.x - transform.position.x;
+            float sy = mouseStart.y - transform.position.y;
             float x = mousePosition.x - transform.position.x;
             float y = mousePosition.y - transform.position.y;
+            float sangle = Mathf.Atan2(sy, sx) * Mathf.Rad2Deg;
             float angle = Mathf.Atan2(y, x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
+            transform.rotation = Quaternion.Euler(0, 0, angle - sangle);
         }
         else
         {
@@ -52,8 +56,9 @@ public class Ghost : MonoBehaviour, IClickObject
         }
     }
 
-    public void Rotate()
+    public void Rotate(Vector2 start)
     {
+        mouseStart = start;
         rotating = true;
     }
 
@@ -64,18 +69,16 @@ public class Ghost : MonoBehaviour, IClickObject
 
     public void Hide()
     {
-        enabled = false;
+        gameObject.SetActive(false);
         floating = false;
         rotating = false;
-        mySpriteRend.enabled = false;
     }
 
     public void Show(Vector3 pos, Quaternion rot)
     {
         transform.position = pos;
         transform.rotation = rot;
-        enabled = true;
-        mySpriteRend.enabled = true;
+        gameObject.SetActive(true);
     }
 
     //////////////////////// IClickObject ///////////////////////////////
@@ -87,6 +90,8 @@ public class Ghost : MonoBehaviour, IClickObject
 
     public void RightClick()
     {
+        Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseStart = new Vector2(p.x, p.y);
         rotating = true;
     }
     /////////////////////////////////////////////////////////////////////
