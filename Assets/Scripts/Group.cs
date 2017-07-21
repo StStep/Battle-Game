@@ -21,6 +21,10 @@ public class Group : MonoBehaviour {
     private List<Member> members = new List<Member>();
 
     public float speed = .01F;
+    public float maxSpeed = .5F;
+
+    public float gain = .01F;
+    public float maxForce = .5F;
 
     public float space = .33F;
 
@@ -79,14 +83,33 @@ public class Group : MonoBehaviour {
     //    }
 
     //}
-	
-	// Update is called once per frame
-	void Update () {
+
+    public void FixedUpdate()
+    {
         foreach (Member m in members)
         {
+            //Transform child = this.transform.GetChild(m.pInd);
+            ////child.position += speed * (new Vector3(m.dest.x, m.dest.y, 0) - child.position);
+            //Rigidbody2D rb = child.GetComponent<Rigidbody2D>() as Rigidbody2D;
+            //rb.AddForce(speed * (new Vector3(m.dest.x, m.dest.y, 0) - child.position));
+            ////child.position = new Vector3(m.dest.x, m.dest.y, 0);
+
             Transform child = this.transform.GetChild(m.pInd);
-            child.position += speed * (new Vector3(m.dest.x, m.dest.y, 0) - child.position);
-            //child.position = new Vector3(m.dest.x, m.dest.y, 0);
+            Rigidbody2D rb = child.GetComponent<Rigidbody2D>() as Rigidbody2D;
+
+            Vector2 dist = new Vector3(m.dest.x, m.dest.y, 0) - child.position;
+            // calc a target vel proportional to distance (clamped to maxVel)
+            Vector2 tgtVel = Vector2.ClampMagnitude(speed * dist, maxSpeed);
+            // calculate the velocity error
+            Vector2 error = tgtVel - rb.velocity;
+            // calc a force proportional to the error (clamped to maxForce)
+            Vector2 force = Vector2.ClampMagnitude(gain * error, maxForce);
+            rb.AddForce(force);
         }
+    }
+
+    // Update is called once per frame
+    void Update () {
+
     }
 }
