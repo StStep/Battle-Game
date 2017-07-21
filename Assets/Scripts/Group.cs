@@ -39,7 +39,9 @@ public class Group : MonoBehaviour {
         for (int i = 0; i < this.transform.childCount; i++)
         {
             Transform child = this.transform.GetChild(i);
-            members.Add(new Member(i, x, y, this.space));
+            Member m = new Member(i, x, y, this.space);
+            members.Add(m);
+            child.position = m.dest;
             x++;
             if(x >= width)
             {
