@@ -41,7 +41,7 @@ public class Group : MonoBehaviour {
             Transform child = this.transform.GetChild(i);
             Member m = new Member(i, x, y, this.space);
             members.Add(m);
-            child.position = m.dest;
+            child.localPosition = m.dest;
             x++;
             if(x >= width)
             {
@@ -99,7 +99,7 @@ public class Group : MonoBehaviour {
             Transform child = this.transform.GetChild(m.pInd);
             Rigidbody2D rb = child.GetComponent<Rigidbody2D>() as Rigidbody2D;
 
-            Vector2 dist = new Vector3(m.dest.x, m.dest.y, 0) - child.position;
+            Vector2 dist = new Vector3(m.dest.x, m.dest.y, 0) - child.localPosition;
             // calc a target vel proportional to distance (clamped to maxVel)
             Vector2 tgtVel = Vector2.ClampMagnitude(speed * dist, maxSpeed);
             // calculate the velocity error
@@ -108,6 +108,8 @@ public class Group : MonoBehaviour {
             Vector2 force = Vector2.ClampMagnitude(gain * error, maxForce);
             rb.AddForce(force);
         }
+
+        //this.transform.position = this.transform.position + new Vector3(0.1, 0, 0);
     }
 
     // Update is called once per frame
