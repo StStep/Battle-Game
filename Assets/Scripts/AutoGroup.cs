@@ -29,9 +29,11 @@ public class AutoMember
     }
 }
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class AutoGroup : MonoBehaviour {
 
     private List<AutoMember> members = new List<AutoMember>();
+    private BoxCollider2D coll;
 
     public bool rectOrder = true;
     public float inSpace = .33F;
@@ -62,6 +64,23 @@ public class AutoGroup : MonoBehaviour {
                 y++;
             }
         }
+        if (x == 0)
+            y--;
+        Vector2 size;
+        if(rectOrder)
+        {
+            size = new Vector2((frontage - 1) * 2 * innerSpace + 2 * bodyRadius, y * 2 * innerSpace + 2 * bodyRadius);
+        }
+        else
+        {
+            // TODO Fix this
+            float height = innerSpace * 2;
+            float vert = height * 3 / 4;
+            float width = (float)System.Math.Sqrt((double)3) / 2 * height;
+            size = new Vector2((frontage - 1) * width + 2 * bodyRadius, y * height + 2 * bodyRadius);
+        }
+        coll.size = size;
+        coll.offset = new Vector2 (size.x /2 - bodyRadius, -size.y/2 + bodyRadius);
     }
 
     private void InstantiateMembers()
@@ -75,6 +94,7 @@ public class AutoGroup : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        coll = GetComponentInChildren(typeof(BoxCollider2D)) as BoxCollider2D;
         InstantiateMembers();
     }
 	
