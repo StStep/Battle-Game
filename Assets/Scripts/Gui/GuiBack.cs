@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D))]
-public class Background : MonoBehaviour
+public class GuiBack : MonoBehaviour
 {
     ////////////////////// CLICKOBJECT I/F //////////////////////////////
 

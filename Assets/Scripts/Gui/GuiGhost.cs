@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Ghost : MonoBehaviour
+public class GuiGhost : MonoBehaviour
 {
     private bool floating;
     private bool rotating;

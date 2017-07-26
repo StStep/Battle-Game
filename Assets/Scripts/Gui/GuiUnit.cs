@@ -4,17 +4,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(Sprite))]
-public class Unit : MonoBehaviour, ISelectable
+public class GuiUnit : MonoBehaviour, ISelectable
 {
     private bool selected = false;
     private SpriteRenderer mySpriteRend;
-    private Ghost myGhost;
+    private GuiGhost myGhost;
 
     // Use this for initialization
     public void Start()
     {
         mySpriteRend = GetComponent<SpriteRenderer>();
-        this.myGhost = GetComponentInChildren(typeof(Ghost)) as Ghost;
+        this.myGhost = GetComponentInChildren(typeof(GuiGhost)) as GuiGhost;
         if(this.myGhost == null)
         {
             Debug.LogError("No ghost object found.");
