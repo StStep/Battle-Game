@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(Sprite))]
-public class Unit : MonoBehaviour, ISelectable, IClickObject
+public class Unit : MonoBehaviour, ISelectable
 {
     private bool selected = false;
     private SpriteRenderer mySpriteRend;
@@ -49,6 +50,27 @@ public class Unit : MonoBehaviour, ISelectable, IClickObject
     /////////////////////////////////////////////////////////////////////
 
     //////////////////////// IClickObject ///////////////////////////////
+
+    public void OnMouseOver()
+    {
+        // Ignore UI click
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        // Left Click
+        if (Input.GetMouseButtonDown(0))
+            LeftClick();
+
+        // Right Click
+        if (Input.GetMouseButtonDown(1))
+            RightClick();
+
+        // Middle Click
+        if (Input.GetMouseButtonDown(2))
+            Debug.Log("Pressed middle click.");
+    }
 
     public void LeftClick()
     {
