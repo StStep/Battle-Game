@@ -86,12 +86,15 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
     void DrawPath(List<Tools.Point> path)
     {
-        Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(path[0].X, path[0].Y, 0));
-        start.z = 0;
-        Vector3 end = Camera.main.ScreenToWorldPoint(new Vector3(path[path.Count - 1].X, path[path.Count - 1].Y, 0));
-        end.z = 0;
+        for(int i = 0; i < path.Count - 1; i++)
+        {
+            Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(path[i].X, path[i].Y, 0));
+            start.z = 0;
+            Vector3 end = Camera.main.ScreenToWorldPoint(new Vector3(path[i + 1].X, path[i + 1].Y, 0));
+            end.z = 0;
 
-        DrawLine(start, end, Color.red, 2f);
+            DrawLine(start, end, Color.red, 2f);
+        }
     }
 
 
@@ -104,8 +107,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
         lr.startColor = color;
         lr.endColor = color;
-        lr.startWidth = 0.1f;
-        lr.endWidth = 0.1f;
+        lr.startWidth = 0.05f;
+        lr.endWidth = 0.05f;
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
         GameObject.Destroy(myLine, duration);
