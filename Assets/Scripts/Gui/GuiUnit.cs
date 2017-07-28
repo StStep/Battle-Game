@@ -86,7 +86,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
     void DrawPath(List<Tools.Point> path)
     {
-        for(int i = 0; i < path.Count - 1; i++)
+        Debug.Log(String.Format("Drawing {0} points", path.Count));
+        for (int i = 0; i < path.Count - 1; i++)
         {
             Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(path[i].X, path[i].Y, 0));
             start.z = 0;
@@ -123,11 +124,11 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             Tools.Point mousePosition = new Tools.Point((Int32)Mathf.Round(Input.mousePosition.x), (Int32)Mathf.Round(Input.mousePosition.y));
             drawPoints.Add(mousePosition);
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(.05f);
         }
 
         Debug.Log(String.Format("Collected {0} points", drawPoints.Count));
-        DrawPath(drawPoints);
+        DrawPath(Tools.DouglasPeuckerReduction(drawPoints, 2f));
         tracking = false;
     }
 
