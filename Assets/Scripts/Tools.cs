@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
+/// <summary>
+/// DouglasPeuckerReduction Source:
+/// https://www.codeproject.com/Articles/18936/A-C-Implementation-of-Douglas-Peucker-Line-Appro
+/// </summary>
 public static class Tools
 {
     public struct Point
