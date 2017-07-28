@@ -84,6 +84,33 @@ public class GuiUnit : MonoBehaviour, ISelectable
         GameManager.instance.SelectItem(this);
     }
 
+    void DrawPath(List<Tools.Point> path)
+    {
+        Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(path[0].X, path[0].Y, 0));
+        start.z = 0;
+        Vector3 end = Camera.main.ScreenToWorldPoint(new Vector3(path[path.Count - 1].X, path[path.Count - 1].Y, 0));
+        end.z = 0;
+
+        DrawLine(start, end, Color.red, 2f);
+    }
+
+
+    void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0.2f)
+    {
+        GameObject myLine = new GameObject();
+        myLine.transform.position = start;
+        myLine.AddComponent<LineRenderer>();
+        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+        lr.startColor = color;
+        lr.endColor = color;
+        lr.startWidth = 0.1f;
+        lr.endWidth = 0.1f;
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
+        GameObject.Destroy(myLine, duration);
+    }
+
     IEnumerator TrackMouse()
     {
         tracking = true;
@@ -97,6 +124,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
 
         Debug.Log(String.Format("Collected {0} points", drawPoints.Count));
+        DrawPath(drawPoints);
         tracking = false;
     }
 
