@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// DouglasPeuckerReduction Source:
@@ -8,6 +9,9 @@ using System.Collections.Generic;
 /// </summary>
 public static class Tools
 {
+    /// <summary>
+    /// Used specifically for DPR algo, integers
+    /// </summary>
     public struct Point
     {
         public Int32 X, Y;
@@ -17,6 +21,81 @@ public static class Tools
             Y = py;
         }
 
+    }
+
+    public struct Line
+    {
+        public Vector2 Start, End;
+        public Line(Vector2 strt, Vector2 end)
+        {
+            Start = strt;
+            End = end;
+        }
+
+    }
+
+    public struct Arc
+    {
+        public Vector2 Start, End, Center;
+        public Arc(Vector2 strt, Vector2 end, Vector2 cntr)
+        {
+            Start = strt;
+            End = end;
+            Center = cntr;
+        }
+
+    }
+
+    public struct LinePos
+    {
+        public bool Valid;
+        public Line Line;
+    }
+
+    public struct ArcPos
+    {
+        public bool Valid;
+        public Arc Arc;
+    }
+
+    /// <summary>
+    /// Returns a line, if valid, starting at the given line direction
+    /// and ending at the given point.
+    /// </summary>
+    /// <param name="dir"></param>
+    /// <param name="pnt"></param>
+    /// <param name="tolerance"></param>
+    /// <returns></returns>
+    public static LinePos GetLine(Line dir, Vector2 pnt, float tolerance)
+    {
+        LinePos ret = new LinePos();
+        ret.Valid = false;
+
+        // Get perp-dist of pnt from dir extended to infiunity
+        // If perp distance less than tolerance, valid line, from dir
+        // to closest point on extended dir
+
+        return ret;
+    }
+
+    /// <summary>
+    /// Returns an arc, if valid, starting at the given line direction
+    /// and ending at the given point.
+    /// </summary>
+    /// <param name="dir"></param>
+    /// <param name="pnt"></param>
+    /// <returns></returns>
+    public static ArcPos GetArc(Line dir, Vector2 pnt)
+    {
+        ArcPos ret = new ArcPos();
+        ret.Valid = false;
+
+        // make dir tangent by haVing radius perp to it
+        // Make right angle through both points
+        // Line parallell to dir, goes through pnt, where intsects line
+        // perp to dir
+
+        return ret;
     }
 
     /// <summary>
