@@ -12,6 +12,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private SpriteRenderer mySpriteRend;
     private GuiGhost myGhost;
     private List<Tools.Point> drawPoints = new List<Tools.Point>();
+    LineRenderer myLr;
 
     // Use this for initialization
     public void Start()
@@ -24,12 +25,42 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
         this.myGhost.Hide();
         Deselect();
+
+        // Make line
+        GameObject myLine = new GameObject();
+        myLine.transform.parent = this.gameObject.transform;
+        myLine.transform.position = this.transform.position;
+        myLine.AddComponent<LineRenderer>();
+        myLr = myLine.GetComponent<LineRenderer>();
+        myLr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+        myLr.startColor = Color.red;
+        myLr.endColor = Color.red;
+        myLr.startWidth = 0.05f;
+        myLr.endWidth = 0.05f;
+        myLr.positionCount = 1;
+        myLr.SetPosition(0, this.transform.position);
     }
 
     // Update is called once per frame
     public void Update()
     {
-        ;
+        if(tracking)
+        {
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Ray2D dir = new Ray2D(transform.position, transform.up);
+            dir.ToString();
+            Tools.LinePos lp = Tools.GetLine(dir, mousePosition, .25f);
+            if(lp.Valid)
+            {
+                myLr.positionCount = 2;
+                myLr.SetPosition(1, new Vector3(lp.Line.End.x, lp.Line.End.y));
+            }
+
+            else
+            {
+                myLr.positionCount = 1;
+            }
+        }
     }
 
     //////////////////////// ISelectable ///////////////////////////////
@@ -66,8 +97,9 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonDown(0))
         {
             LeftClick();
-            if(!tracking)
-                StartCoroutine("TrackMouse");
+            if (!tracking)
+                tracking = true;
+                //StartCoroutine("TrackMouse");
         }
 
         // Right Click
