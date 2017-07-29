@@ -58,6 +58,14 @@ public static class Tools
         public Arc Arc;
     }
 
+    public static Vector2 NearestPointOnLine(Ray2D dir, Vector2 pnt)
+    {
+        Vector2 v = pnt - dir.origin;
+        float d = Vector2.Dot(v, dir.direction);
+        return dir.GetPoint(d);
+    }
+
+
     /// <summary>
     /// Returns a line, if valid, starting at the given line direction
     /// and ending at the given point.
@@ -66,14 +74,19 @@ public static class Tools
     /// <param name="pnt"></param>
     /// <param name="tolerance"></param>
     /// <returns></returns>
-    public static LinePos GetLine(Line dir, Vector2 pnt, float tolerance)
+    public static LinePos GetLine(Ray2D dir, Vector2 pnt, float tolerance)
     {
         LinePos ret = new LinePos();
         ret.Valid = false;
 
-        // Get perp-dist of pnt from dir extended to infiunity
-        // If perp distance less than tolerance, valid line, from dir
-        // to closest point on extended dir
+        Vector2 linepnt = NearestPointOnLine(dir, pnt);
+        float dist = Vector2.Distance(linepnt, pnt);
+
+        if (dist <= tolerance)
+        {
+            ret.Valid = true;
+            ret.Line = new Line(dir.origin, linepnt);
+        }
 
         return ret;
     }
@@ -85,7 +98,7 @@ public static class Tools
     /// <param name="dir"></param>
     /// <param name="pnt"></param>
     /// <returns></returns>
-    public static ArcPos GetArc(Line dir, Vector2 pnt)
+    public static ArcPos GetArc(Ray2D dir, Vector2 pnt)
     {
         ArcPos ret = new ArcPos();
         ret.Valid = false;
