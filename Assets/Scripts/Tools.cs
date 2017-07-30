@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// </summary>
-public static class Tools
+public static class Trig
 {
 
     public struct Line
@@ -169,5 +169,54 @@ public static class Tools
         ret.Arc = new Arc(dir.origin, pnt, center);
 
         return ret;
+    }
+
+    public static void DrawLine(LineRenderer lr, Line line)
+    {
+        lr.positionCount = 2;
+        lr.SetPosition(0, new Vector3(line.Start.x, line.Start.y));
+        lr.SetPosition(1, new Vector3(line.End.x, line.End.y));
+    }
+
+    public static void DrawArc(LineRenderer lr, Arc arc, int seg)
+    {
+        int segments = 20;
+        lr.positionCount = segments + 1;
+        float rawAngle = Vector2.SignedAngle(arc.Start - arc.Center, arc.End - arc.Center);
+        Debug.Log(rawAngle);
+        bool clockwise = (rawAngle < 0);
+        float angle = (clockwise) ? -90 : 90;
+        float arcLength = Mathf.Abs(rawAngle);
+        float radius = Mathf.Abs(Vector2.Distance(arc.Start, arc.Center));
+        for (int i = 0; i <= segments; i++)
+        {
+            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+            float y = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+
+            lr.SetPosition(i, new Vector3(x + arc.Center.x, y + arc.Center.y));
+
+            angle += (clockwise) ? (arcLength / segments) : -(arcLength / segments);
+        }
+        lr.SetPosition(segments, arc.End);
+    }
+}
+
+public static class Create
+{
+    public static LineRenderer LineRender(GameObject parent, String name, Color color)
+    {
+        GameObject myLine = new GameObject();
+        myLine.name = name;
+        myLine.transform.parent = parent.transform;
+        myLine.transform.position = parent.transform.position;
+        myLine.AddComponent<LineRenderer>();
+        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+        lr.startColor = color;
+        lr.endColor = color;
+        lr.startWidth = 0.05f;
+        lr.endWidth = 0.05f;
+        lr.positionCount = 0;
+        return lr;
     }
 }
