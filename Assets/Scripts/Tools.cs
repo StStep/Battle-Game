@@ -193,7 +193,6 @@ public static class Trig
         int segments = 20;
         lr.positionCount = segments + 1;
         float rawAngle = Vector2.SignedAngle(arc.Start - arc.Center, arc.End - arc.Center);
-        Debug.Log(rawAngle);
         bool clockwise = (rawAngle < 0);
         float angle = (clockwise) ? -90 : 90;
         float arcLength = Mathf.Abs(rawAngle);

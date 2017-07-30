@@ -5,12 +5,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(Sprite))]
-public class GuiUnit : MonoBehaviour, ISelectable
+public class GuiUnit : MonoBehaviour
 {
     enum State {None, Moving};
 
     private bool mSel = false;
     private State mState = State.None;
+    private Selector mSelector;
 
     // Prefab items
     private SpriteRenderer mySpriteRend;
@@ -26,6 +27,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     // Use this for initialization
     public void Start()
     {
+        // Prefab items
         mySpriteRend = GetComponent<SpriteRenderer>();
         this.myGhost = GetComponentInChildren(typeof(GuiGhost)) as GuiGhost;
         if(this.myGhost == null)
@@ -33,6 +35,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
             Debug.LogError("No ghost object found.");
         }
         this.myGhost.Show(false);
+
+        // Selector
+        mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, 
+                                    this.Select, this.Deselect);
 
         // Make lines
         mLrMove = Create.LineRender(gameObject, "MovementLine", Color.red);
@@ -118,6 +124,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
                 myGhost.Show(false);
             }
         }
+
+        // TODO If left Click Finalize state
     }
 
     #endregion
@@ -125,11 +133,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
-
-    public string Name()
-    {
-        return this.gameObject.name;
-    }
 
     public bool Select()
     {
@@ -154,8 +157,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
     /////////////////////////////////////////////////////////////////////
     #endregion
 
-    #region IClickObject
-    //////////////////////// IClickObject ///////////////////////////////
+    #region MouseIF
+    //////////////////////// MouseIF ///////////////////////////////
 
     public void OnMouseOver()
     {
@@ -167,10 +170,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         // Left Click
         if (Input.GetMouseButtonDown(0))
-        {
             LeftClick();
-        }
-
+ 
         // Right Click
         if (Input.GetMouseButtonDown(1))
             RightClick();
@@ -184,7 +185,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     {
         if(!mSel)
         {
-            GameManager.instance.SelectItem(this);
+            mSelector.ParentSelect();
         }
 
         if (mSel)
@@ -200,12 +201,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
     {
         if (!mSel)
         {
-            GameManager.instance.SelectItem(this);
+            mSelector.ParentSelect();
         }
 
-        //Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //myGhost.Rotate(new Vector2(p.x, p.y));
-        //myGhost.Show(this.gameObject.transform.position, this.gameObject.transform.rotation);
+        // TODO Rotate
     }
     /////////////////////////////////////////////////////////////////////
     #endregion

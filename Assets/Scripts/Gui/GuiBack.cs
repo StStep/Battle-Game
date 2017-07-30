@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider2D))]
 public class GuiBack : MonoBehaviour
 {
-    ////////////////////// CLICKOBJECT I/F //////////////////////////////
+    #region MouseIF
+    ////////////////////// MouseIF //////////////////////////////
 
     public void OnMouseOver()
     {
@@ -31,13 +32,14 @@ public class GuiBack : MonoBehaviour
 
     public void LeftClick()
     {
-        GameManager.instance.Deselect();
+        GameManager.instance.mSelector.Deselect();
     }
 
     public void RightClick()
     {
-        GameManager.instance.Deselect();
+        GameManager.instance.mSelector.Deselect();
     }
 
     /////////////////////////////////////////////////////////////////////
+    #endregion
 }
