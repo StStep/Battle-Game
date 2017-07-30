@@ -22,11 +22,13 @@ public static class Trig
     public struct Arc
     {
         public Vector2 Start, End, Center;
-        public Arc(Vector2 strt, Vector2 end, Vector2 cntr)
+        public Vector2 FinalDir;
+        public Arc(Vector2 strt, Vector2 end, Vector2 cntr, Vector2 dir)
         {
             Start = strt;
             End = end;
             Center = cntr;
+            FinalDir = dir;
         }
 
     }
@@ -154,19 +156,22 @@ public static class Trig
         }
 
         Vector2 newDir;
+        Vector2 finalDir; // Perp to lebB is final facing direction
         if (clockwise)
         {
             newDir = Quaternion.AngleAxis(-legAng, Vector3.forward) * triBaseIn;
+            finalDir = Quaternion.AngleAxis(-90, Vector3.forward) * newDir;
         }
         else
         {
             newDir = Quaternion.AngleAxis(legAng, Vector3.forward) * triBaseIn;
+            finalDir = Quaternion.AngleAxis(90, Vector3.forward) * newDir;
         }
         Ray2D legB = new Ray2D(pnt, newDir);
 
         Vector2 center = LineIntersectionPoint(legA.origin,  legA.origin + legA.direction, legB.origin, legB.origin + legB.direction);
         ret.Valid = true;
-        ret.Arc = new Arc(dir.origin, pnt, center);
+        ret.Arc = new Arc(dir.origin, pnt, center, finalDir);
 
         return ret;
     }

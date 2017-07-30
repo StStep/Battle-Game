@@ -32,7 +32,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             Debug.LogError("No ghost object found.");
         }
-        this.myGhost.Hide();
+        this.myGhost.Show(false);
 
         // Make lines
         mLrMove = Create.LineRender(gameObject, "MovementLine", Color.red);
@@ -84,15 +84,22 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             mState = State.None;
             mLrMove.positionCount = 0;
+            myGhost.Show(false);
             return;
         }
 
+        // Draw  Path
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = transform.position.z; // Set Z
         Ray2D dir = new Ray2D(transform.position, transform.up);
         Trig.LinePos lp = Trig.GetLine(dir, mousePosition, .25f);
+        myGhost.Show(true);
         if (lp.Valid)
         {
             Trig.DrawLine(mLrMove, lp.Line);
+
+            // Place Ghost
+            myGhost.SetPos(lp.Line.End, Quaternion.identity);
         }
         else
         {
@@ -100,12 +107,16 @@ public class GuiUnit : MonoBehaviour, ISelectable
             if (ap.Valid)
             {
                 Trig.DrawArc(mLrMove, ap.Arc, 20);
+                float ghRot = Vector2.SignedAngle(dir.direction, ap.Arc.FinalDir);
+
+                // Place Ghost
+                myGhost.SetPos(mousePosition, Quaternion.AngleAxis(ghRot, Vector3.forward));
             }
             else
             {
                 mLrMove.positionCount = 0;
+                myGhost.Show(false);
             }
-
         }
     }
 
@@ -192,9 +203,9 @@ public class GuiUnit : MonoBehaviour, ISelectable
             GameManager.instance.SelectItem(this);
         }
 
-        Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        myGhost.Rotate(new Vector2(p.x, p.y));
-        myGhost.Show(this.gameObject.transform.position, this.gameObject.transform.rotation);
+        //Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //myGhost.Rotate(new Vector2(p.x, p.y));
+        //myGhost.Show(this.gameObject.transform.position, this.gameObject.transform.rotation);
     }
     /////////////////////////////////////////////////////////////////////
     #endregion
