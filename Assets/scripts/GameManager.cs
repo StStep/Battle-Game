@@ -47,14 +47,17 @@ public class GameManager : MonoBehaviour
     {
         if(mSelectedObject == null)
         {
-            mSelectedObject = obj;
-            mSelectedObject.Select();
+            if(obj.Select())
+                mSelectedObject = obj;
         }
         else if (obj != mSelectedObject)
         {
-            mSelectedObject.Deselect();
-            mSelectedObject = obj;
-            mSelectedObject.Select();
+            if (mSelectedObject.Deselect())
+            {
+                mSelectedObject = null;
+                if (obj.Select())
+                    mSelectedObject = obj;
+            }
         }
         else
         {
@@ -64,9 +67,8 @@ public class GameManager : MonoBehaviour
 
     public void Deselect()
     {
-        if(mSelectedObject != null)
+        if((mSelectedObject != null) && mSelectedObject.Deselect())
         {
-            mSelectedObject.Deselect();
             mSelectedObject = null;
         }
     }

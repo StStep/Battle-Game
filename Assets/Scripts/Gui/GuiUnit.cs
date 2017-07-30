@@ -7,10 +7,16 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider2D), typeof(Sprite))]
 public class GuiUnit : MonoBehaviour, ISelectable
 {
-    private bool selected = false;
-    private bool tracking = false;
+    enum State {None, Moving};
+
+    private bool mSel = false;
+    private State mState = State.None;
+
+    // Prefab items
     private SpriteRenderer mySpriteRend;
     private GuiGhost myGhost;
+
+    // Lines, dynamic
     private LineRenderer mLrMove;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
@@ -27,7 +33,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
             Debug.LogError("No ghost object found.");
         }
         this.myGhost.Hide();
-        Deselect();
 
         // Make lines
         mLrMove = Create.LineRender(gameObject, "MovementLine", Color.red);
@@ -46,6 +51,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         EnableGuides(false);
 
+        Deselect();
     }
 
     private void EnableGuides(bool en)
@@ -59,34 +65,54 @@ public class GuiUnit : MonoBehaviour, ISelectable
     // Update is called once per frame
     public void Update()
     {
-        if(tracking)
+        switch (mState)
         {
-            EnableGuides(true);
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Ray2D dir = new Ray2D(transform.position, transform.up);
-            dir.ToString();
-            Trig.LinePos lp = Trig.GetLine(dir, mousePosition, .25f);
-            if(lp.Valid)
-            {
-                Trig.DrawLine(mLrMove, lp.Line);
-            }
-            else
-            {
-                Trig.ArcPos ap = Trig.GetArc(dir, mousePosition);
-
-                if(ap.Valid)
-                {
-                    Trig.DrawArc(mLrMove, ap.Arc, 20);
-                }
-                else
-                {
-                    mLrMove.positionCount = 0;
-                }
-
-            }
+            case State.Moving:
+                StMove();
+                break;
+            default:
+                break;
         }
     }
 
+    #region States
+
+    private void StMove()
+    {
+        // If right Click exit state
+        if (Input.GetMouseButtonDown(1))
+        {
+            mState = State.None;
+            mLrMove.positionCount = 0;
+            return;
+        }
+
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Ray2D dir = new Ray2D(transform.position, transform.up);
+        Trig.LinePos lp = Trig.GetLine(dir, mousePosition, .25f);
+        if (lp.Valid)
+        {
+            Trig.DrawLine(mLrMove, lp.Line);
+        }
+        else
+        {
+            Trig.ArcPos ap = Trig.GetArc(dir, mousePosition);
+            if (ap.Valid)
+            {
+                Trig.DrawArc(mLrMove, ap.Arc, 20);
+            }
+            else
+            {
+                mLrMove.positionCount = 0;
+            }
+
+        }
+    }
+
+    #endregion
+
+
+    #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
     public string Name()
@@ -94,19 +120,30 @@ public class GuiUnit : MonoBehaviour, ISelectable
         return this.gameObject.name;
     }
 
-    public void Select()
+    public bool Select()
     {
-        selected = true;
+        mSel = true;
+        EnableGuides(true);
         mySpriteRend.color = Color.yellow;
+
+        return true;
     }
 
-    public void Deselect()
+    public bool Deselect()
     {
-        selected = false;
+        // Only deslect if doing nothing
+        if (mState != State.None)
+            return false;
+
+        mSel = false;
         mySpriteRend.color = Color.blue;
+        EnableGuides(false);
+        return true;
     }
     /////////////////////////////////////////////////////////////////////
+    #endregion
 
+    #region IClickObject
     //////////////////////// IClickObject ///////////////////////////////
 
     public void OnMouseOver()
@@ -121,8 +158,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonDown(0))
         {
             LeftClick();
-            if (!tracking)
-                tracking = true;
         }
 
         // Right Click
@@ -136,16 +171,31 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
     public void LeftClick()
     {
-        GameManager.instance.SelectItem(this);
+        if(!mSel)
+        {
+            GameManager.instance.SelectItem(this);
+        }
+
+        if (mSel)
+        {
+            if (mState == State.None)
+            {
+                mState = State.Moving; // Defualt to moving after selecting
+            }
+        }
     }
 
     public void RightClick()
     {
-        GameManager.instance.SelectItem(this);
+        if (!mSel)
+        {
+            GameManager.instance.SelectItem(this);
+        }
 
         Vector3 p = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         myGhost.Rotate(new Vector2(p.x, p.y));
         myGhost.Show(this.gameObject.transform.position, this.gameObject.transform.rotation);
     }
     /////////////////////////////////////////////////////////////////////
+    #endregion
 }
