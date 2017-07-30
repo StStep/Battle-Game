@@ -98,15 +98,28 @@ public static class Tools
     /// <param name="dir"></param>
     /// <param name="pnt"></param>
     /// <returns></returns>
-    public static ArcPos GetArc(Ray2D dir, Vector2 pnt)
+    public static ArcPos GetArc(Ray2D dir, Vector2 pnt, float radius)
     {
         ArcPos ret = new ArcPos();
         ret.Valid = false;
 
-        // make dir tangent by haVing radius perp to it
-        // Make right angle through both points
-        // Line parallell to dir, goes through pnt, where intsects line
-        // perp to dir
+        // Check what side of dir pnt is
+        Vector2 v = pnt - dir.origin; // direction to pnt
+        Ray2D perp = dir;
+        if (Vector2.SignedAngle(dir.direction, v) < 0)
+        {
+            perp.direction = new Vector2(-perp.direction.y, perp.direction.x);
+        }
+        else
+        {
+            perp.direction = new Vector2(perp.direction.y, -perp.direction.x);
+        }
+
+        Vector2 center = perp.GetPoint(radius);
+
+        // TODO check validy based on turn angle or something
+        ret.Valid = true;
+        ret.Arc = new Arc(dir.origin, pnt, center);
 
         return ret;
     }

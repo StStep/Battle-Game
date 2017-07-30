@@ -55,10 +55,12 @@ public class GuiUnit : MonoBehaviour, ISelectable
                 myLr.positionCount = 2;
                 myLr.SetPosition(1, new Vector3(lp.Line.End.x, lp.Line.End.y));
             }
-
             else
             {
-                myLr.positionCount = 1;
+                Tools.ArcPos ap = Tools.GetArc(dir, mousePosition, 2f);
+                // TODO TEMP always valid
+                myLr.positionCount = 2;
+                myLr.SetPosition(1, new Vector3(ap.Arc.Center.x, ap.Arc.Center.y));
             }
         }
     }
