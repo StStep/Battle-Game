@@ -11,7 +11,11 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private bool tracking = false;
     private SpriteRenderer mySpriteRend;
     private GuiGhost myGhost;
-    LineRenderer myLr;
+    private LineRenderer mLrMove;
+    private LineRenderer mLrLGuide;
+    private LineRenderer mLrRGuide;
+    private LineRenderer mLrCGuide;
+
 
     // Use this for initialization
     public void Start()
@@ -25,8 +29,31 @@ public class GuiUnit : MonoBehaviour, ISelectable
         this.myGhost.Hide();
         Deselect();
 
-        // Make line
-        myLr = Create.LineRender(gameObject, "MovementLine", Color.red);
+        // Make lines
+        mLrMove = Create.LineRender(gameObject, "MovementLine", Color.red);
+
+        mLrLGuide = Create.LineRender(gameObject, "LeftGuide", Color.yellow);
+        mLrLGuide.useWorldSpace = false;
+        Trig.DrawLine(mLrLGuide, new Vector2(0, 0), new Vector2(100, 100));
+
+        mLrRGuide = Create.LineRender(gameObject, "RightGuide", Color.yellow);
+        mLrRGuide.useWorldSpace = false;
+        Trig.DrawLine(mLrRGuide, new Vector2(0, 0), new Vector2(-100, 100));
+
+        mLrCGuide = Create.LineRender(gameObject, "CenterGuide", Color.green);
+        mLrCGuide.useWorldSpace = false;
+        Trig.DrawLine(mLrCGuide, new Vector2(0, 0), new Vector2(0, 100));
+
+        EnableGuides(false);
+
+    }
+
+    private void EnableGuides(bool en)
+    {
+        mLrLGuide.enabled = en;
+        mLrRGuide.enabled = en;
+        mLrCGuide.enabled = en;
+
     }
 
     // Update is called once per frame
@@ -34,13 +61,14 @@ public class GuiUnit : MonoBehaviour, ISelectable
     {
         if(tracking)
         {
+            EnableGuides(true);
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Ray2D dir = new Ray2D(transform.position, transform.up);
             dir.ToString();
             Trig.LinePos lp = Trig.GetLine(dir, mousePosition, .25f);
             if(lp.Valid)
             {
-                Trig.DrawLine(myLr, lp.Line);
+                Trig.DrawLine(mLrMove, lp.Line);
             }
             else
             {
@@ -48,11 +76,11 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
                 if(ap.Valid)
                 {
-                    Trig.DrawArc(myLr, ap.Arc, 20);
+                    Trig.DrawArc(mLrMove, ap.Arc, 20);
                 }
                 else
                 {
-                    myLr.positionCount = 0;
+                    mLrMove.positionCount = 0;
                 }
 
             }
@@ -94,7 +122,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             LeftClick();
             if (!tracking)
-                tracking = true;        }
+                tracking = true;
+        }
 
         // Right Click
         if (Input.GetMouseButtonDown(1))

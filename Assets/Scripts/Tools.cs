@@ -173,9 +173,14 @@ public static class Trig
 
     public static void DrawLine(LineRenderer lr, Line line)
     {
+        DrawLine(lr, line.Start, line.End);
+    }
+
+    public static void DrawLine(LineRenderer lr, Vector2 strt, Vector2 end)
+    {
         lr.positionCount = 2;
-        lr.SetPosition(0, new Vector3(line.Start.x, line.Start.y));
-        lr.SetPosition(1, new Vector3(line.End.x, line.End.y));
+        lr.SetPosition(0, new Vector3(strt.x, strt.y));
+        lr.SetPosition(1, new Vector3(end.x, end.y));
     }
 
     public static void DrawArc(LineRenderer lr, Arc arc, int seg)
