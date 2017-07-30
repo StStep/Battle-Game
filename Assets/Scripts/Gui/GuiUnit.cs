@@ -57,10 +57,18 @@ public class GuiUnit : MonoBehaviour, ISelectable
             }
             else
             {
-                Tools.ArcPos ap = Tools.GetArc(dir, mousePosition, 2f);
-                // TODO TEMP always valid
-                myLr.positionCount = 2;
-                myLr.SetPosition(1, new Vector3(ap.Arc.Center.x, ap.Arc.Center.y));
+                Tools.ArcPos ap = Tools.GetArc(dir, mousePosition);
+
+                if(ap.Valid)
+                {
+                    myLr.positionCount = 2;
+                    myLr.SetPosition(1, new Vector3(ap.Arc.Center.x, ap.Arc.Center.y));
+                }
+                else
+                {
+                    myLr.positionCount = 1;
+                }
+
             }
         }
     }
