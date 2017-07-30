@@ -53,6 +53,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
             if(lp.Valid)
             {
                 myLr.positionCount = 2;
+                myLr.SetPosition(0, new Vector3(lp.Line.Start.x, lp.Line.Start.y));
                 myLr.SetPosition(1, new Vector3(lp.Line.End.x, lp.Line.End.y));
             }
             else
@@ -61,8 +62,25 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
                 if(ap.Valid)
                 {
-                    myLr.positionCount = 2;
-                    myLr.SetPosition(1, new Vector3(ap.Arc.Center.x, ap.Arc.Center.y));
+                    int segments = 20;
+                    myLr.positionCount = segments + 1;
+                    float rawAngle = Vector2.SignedAngle(ap.Arc.Start - ap.Arc.Center, ap.Arc.End - ap.Arc.Center);
+                    Debug.Log(rawAngle);
+                    bool clockwise = (rawAngle < 0);
+                    float angle = (clockwise) ? -90 : 90;
+                    float arcLength = Mathf.Abs(rawAngle);
+                    float radius = Mathf.Abs(Vector2.Distance(ap.Arc.Start, ap.Arc.Center));
+                    for (int i = 0; i <= segments; i++)
+                    {
+                        float x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+                        float y = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+
+                        myLr.SetPosition(i, new Vector3(x + ap.Arc.Center.x, y + ap.Arc.Center.y));
+
+                        angle += (clockwise) ? (arcLength / segments) : -(arcLength / segments);
+                    }
+                    myLr.SetPosition(segments, ap.Arc.End);
+
                 }
                 else
                 {

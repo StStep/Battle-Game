@@ -185,7 +185,7 @@ public static class Tools
         }
         Ray2D legB = new Ray2D(pnt, newDir);
 
-        Debug.Log(String.Format("LegA {0}; LegB {1}; Ang {2}", legA, legB, legAng));
+        //Debug.Log(String.Format("LegA {0}; LegB {1}; Ang {2}", legA, legB, legAng));
         //Debug.Log(String.Format("LegA to Base {0} deg; LegB to Base {1} deg;", Vector2.SignedAngle(legA.direction, triBaseOut), Vector2.SignedAngle(triBaseIn, legB.direction)));
 
         // TODO Use isolsiles triangle, probably okay math
