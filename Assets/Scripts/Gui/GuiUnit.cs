@@ -11,7 +11,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private bool tracking = false;
     private SpriteRenderer mySpriteRend;
     private GuiGhost myGhost;
-    private List<Tools.Point> drawPoints = new List<Tools.Point>();
     LineRenderer myLr;
 
     // Use this for initialization
@@ -126,9 +125,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             LeftClick();
             if (!tracking)
-                tracking = true;
-                //StartCoroutine("TrackMouse");
-        }
+                tracking = true;        }
 
         // Right Click
         if (Input.GetMouseButtonDown(1))
@@ -142,20 +139,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
     public void LeftClick()
     {
         GameManager.instance.SelectItem(this);
-    }
-
-    void DrawPath(List<Tools.Point> path)
-    {
-        Debug.Log(String.Format("Drawing {0} points", path.Count));
-        for (int i = 0; i < path.Count - 1; i++)
-        {
-            Vector3 start = Camera.main.ScreenToWorldPoint(new Vector3(path[i].X, path[i].Y, 0));
-            start.z = 0;
-            Vector3 end = Camera.main.ScreenToWorldPoint(new Vector3(path[i + 1].X, path[i + 1].Y, 0));
-            end.z = 0;
-
-            DrawLine(start, end, Color.red, 2f);
-        }
     }
 
 
@@ -173,23 +156,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
         GameObject.Destroy(myLine, duration);
-    }
-
-    IEnumerator TrackMouse()
-    {
-        tracking = true;
-        drawPoints.Clear();
-
-        while(Input.GetMouseButton(0))
-        {
-            Tools.Point mousePosition = new Tools.Point((Int32)Mathf.Round(Input.mousePosition.x), (Int32)Mathf.Round(Input.mousePosition.y));
-            drawPoints.Add(mousePosition);
-            yield return new WaitForSeconds(.05f);
-        }
-
-        Debug.Log(String.Format("Collected {0} points", drawPoints.Count));
-        DrawPath(Tools.DouglasPeuckerReduction(drawPoints, 2f));
-        tracking = false;
     }
 
     public void RightClick()
