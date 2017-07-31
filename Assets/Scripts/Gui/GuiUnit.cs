@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(Sprite))]
-public class GuiUnit : MonoBehaviour
+public class GuiUnit : MonoBehaviour, ISelectable
 {
     enum State {None, Moving};
 
@@ -37,8 +37,7 @@ public class GuiUnit : MonoBehaviour
         this.myGhost.Show(false);
 
         // Selector
-        mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, 
-                                    this.Select, this.Deselect);
+        mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
 
         // Make lines
         mLrMove = Create.LineRender(gameObject, "MovementLine", Color.red);

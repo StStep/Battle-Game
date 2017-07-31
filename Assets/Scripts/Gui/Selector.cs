@@ -1,25 +1,30 @@
 ﻿using System;
 
+public interface ISelectable
+{
+    bool Select();
+
+    bool Deselect();
+}
+
 public class Selector
 {
     public delegate bool Sel();
 
     private String mName;
     private Selector mPar;
-    private Sel mSel;
-    private Sel mDeSel;
+    private ISelectable mItem;
     private Selector mChild;
 
-    public Selector(String name) : this(name, null, null, null)
+    public Selector(String name) : this(name, null, null)
     { }
 
-    public Selector(String name, Selector parent, Sel sel, Sel deSel)
+    public Selector(String name, Selector parent, ISelectable item)
     {
         mName = name;
         mChild = null;
         mPar = parent;
-        mSel = sel;
-        mDeSel = deSel;
+        mItem = item;
     }
 
     public bool ParentSelect()
@@ -72,16 +77,16 @@ public class Selector
 
     public bool Select()
     {
-        if (mSel == null)
+        if (mItem == null)
             return true;
 
-        return mSel();
+        return mItem.Select();
     }
 
     public bool Deselect()
     {
         // Deslect self
-        if ((mDeSel != null) && !mDeSel())
+        if ((mItem != null) && !mItem.Deselect())
             return false;
 
         //Deselect Children
