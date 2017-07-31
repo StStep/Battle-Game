@@ -7,10 +7,11 @@ public interface ISelectable
     bool Deselect();
 }
 
+/// <summary>
+/// A composite class that acts like a select/deselect chain.
+/// </summary>
 public class Selector
 {
-    public delegate bool Sel();
-
     private String mName;
     private Selector mPar;
     private ISelectable mItem;
@@ -27,7 +28,11 @@ public class Selector
         mItem = item;
     }
 
-    public bool ParentSelect()
+    /// <summary>
+    /// Select self from the highest parent downwards.
+    /// </summary>
+    /// <returns>True if sucessfully selected form highest parent</returns>
+    public bool ChainSelect()
     {
         bool ret = true;
         if (mPar != null)
@@ -37,28 +42,54 @@ public class Selector
         return ret;
     }
 
-    public bool SelectChild(Selector obj)
+    /// <summary>
+    /// Deselect from self to lowest child.
+    /// </summary>
+    /// <returns>Returns true if successfully deselect from self to lowest child</returns>
+    public bool ChainDeselect()
+    {
+        // Deslect self
+        if ((mItem != null) && !mItem.Deselect())
+            return false;
+
+        //Deselect Children
+        if (mChild == null)
+            return true;
+
+        if (!mChild.ChainDeselect())
+            return false;
+
+        mChild = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Called to set given selector as selector item.
+    /// </summary>
+    /// <param name="obj">Selector to select</param>
+    /// <returns>True if successfully selected.</returns>
+    private bool SelectChild(Selector obj)
     {
         if(mPar != null)
         {
-            if (!mPar.ParentSelect())
+            if (!mPar.ChainSelect())
                 return false;
         }
 
         bool ret = true;
         if (mChild == null)
         {
-            if (obj.Select())
+            if (obj.SelectItem())
                 mChild = obj;
             else
                 ret = false;
         }
         else if (obj != mChild)
         {
-            if (mChild.Deselect())
+            if (mChild.ChainDeselect())
             {
                 mChild = null;
-                if (obj.Select())
+                if (obj.SelectItem())
                     mChild = obj;
                 else
                     ret = false;
@@ -75,28 +106,15 @@ public class Selector
         return ret;
     }
 
-    public bool Select()
+    /// <summary>
+    /// Call item select function if it exists
+    /// </summary>
+    /// <returns>True if sucessfully selected</returns>
+    private bool SelectItem()
     {
         if (mItem == null)
             return true;
 
         return mItem.Select();
-    }
-
-    public bool Deselect()
-    {
-        // Deslect self
-        if ((mItem != null) && !mItem.Deselect())
-            return false;
-
-        //Deselect Children
-        if (mChild == null)
-            return true;
-
-        if (!mChild.Deselect())
-            return false;
-
-        mChild = null;
-        return true;
     }
 }

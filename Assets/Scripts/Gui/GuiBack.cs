@@ -32,12 +32,12 @@ public class GuiBack : MonoBehaviour
 
     public void LeftClick()
     {
-        GameManager.instance.mSelector.Deselect();
+        GameManager.instance.mSelector.ChainDeselect();
     }
 
     public void RightClick()
     {
-        GameManager.instance.mSelector.Deselect();
+        GameManager.instance.mSelector.ChainDeselect();
     }
 
     /////////////////////////////////////////////////////////////////////

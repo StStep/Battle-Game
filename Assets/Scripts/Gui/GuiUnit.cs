@@ -184,7 +184,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     {
         if(!mSel)
         {
-            mSelector.ParentSelect();
+            mSelector.ChainSelect();
         }
 
         if (mSel)
@@ -200,7 +200,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     {
         if (!mSel)
         {
-            mSelector.ParentSelect();
+            mSelector.ChainSelect();
         }
 
         // TODO Rotate
