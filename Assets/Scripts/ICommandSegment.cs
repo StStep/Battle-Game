@@ -3,13 +3,15 @@ using UnityEngine;
 
 public interface ICommandSegment
 {
-    bool IsFixedLen{ get; }
+    //bool IsFixedLen{ get; }
 
-    int Length { get; }
+    //int Length { get; }
 
-    int AdjustLength(int diff);
+    //int AdjustLength(int diff);
 
-    void Remove();
+    //void Remove();
 
     Vector2 Start { get; set; }
+
+    Vector2 End { get; }
 }

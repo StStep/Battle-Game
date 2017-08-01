@@ -40,19 +40,19 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
 
         // Make lines
-        mLrMove = Create.LineRender(gameObject, "MovementLine", Color.red);
+        mLrMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
 
-        mLrLGuide = Create.LineRender(gameObject, "LeftGuide", Color.yellow);
+        mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
         mLrLGuide.useWorldSpace = false;
-        Trig.DrawLine(mLrLGuide, new Vector2(0, 0), new Vector2(100, 100));
+        Draw.DrawLine(mLrLGuide, new Vector2(0, 0), new Vector2(100, 100));
 
-        mLrRGuide = Create.LineRender(gameObject, "RightGuide", Color.yellow);
+        mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
         mLrRGuide.useWorldSpace = false;
-        Trig.DrawLine(mLrRGuide, new Vector2(0, 0), new Vector2(-100, 100));
+        Draw.DrawLine(mLrRGuide, new Vector2(0, 0), new Vector2(-100, 100));
 
-        mLrCGuide = Create.LineRender(gameObject, "CenterGuide", Color.green);
+        mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
         mLrCGuide.useWorldSpace = false;
-        Trig.DrawLine(mLrCGuide, new Vector2(0, 0), new Vector2(0, 100));
+        Draw.DrawLine(mLrCGuide, new Vector2(0, 0), new Vector2(0, 100));
 
         EnableGuides(false);
 
@@ -94,34 +94,35 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
 
         // Draw  Path
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = transform.position.z; // Set Z
+        Vector3 pnt = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        pnt.z = transform.position.z; // Set Z
         Ray2D dir = new Ray2D(transform.position, transform.up);
-        Trig.LinePos lp = Trig.GetLine(dir, mousePosition, .25f);
+
+        // Check Invalid Arc
         myGhost.Show(true);
-        if (lp.Valid)
+        if (!Trig.WithinFrontArc(dir, pnt, 0))
         {
-            Trig.DrawLine(mLrMove, lp.Line);
+            mLrMove.positionCount = 0;
+            myGhost.Show(false);
+        }
+        // Check if Within Line tolerance
+        else if(Trig.DistToLine(dir, pnt) < .25f)
+        {
+            Trig.Line line = new Trig.Line(dir.origin, Trig.NearestPointOnLine(dir, pnt));
+            Draw.DrawLine(mLrMove, line);
 
             // Place Ghost
-            myGhost.SetPos(lp.Line.End, Quaternion.identity);
+            myGhost.SetPos(line.End, Quaternion.identity);
         }
+        // Else Arc
         else
         {
-            Trig.ArcPos ap = Trig.GetArc(dir, mousePosition);
-            if (ap.Valid)
-            {
-                Trig.DrawArc(mLrMove, ap.Arc, 20);
-                float ghRot = Vector2.SignedAngle(dir.direction, ap.Arc.FinalDir);
+            Trig.Arc arc = Trig.GetArc(dir, pnt);
+            Draw.DrawArc(mLrMove, arc, 20);
+            float ghRot = Vector2.SignedAngle(dir.direction, arc.FinalDir);
 
-                // Place Ghost
-                myGhost.SetPos(mousePosition, Quaternion.AngleAxis(ghRot, Vector3.forward));
-            }
-            else
-            {
-                mLrMove.positionCount = 0;
-                myGhost.Show(false);
-            }
+            // Place Ghost
+            myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
 
         // TODO If left Click Finalize state
