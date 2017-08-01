@@ -41,18 +41,23 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         // Make lines
         mLrMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
+        Vector3[] line = new Vector3[2];
+        line[0] = Vector3.zero;
 
         mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
         mLrLGuide.useWorldSpace = false;
-        Draw.DrawLine(mLrLGuide, new Vector2(0, 0), new Vector2(100, 100));
+        line[1] = 100 * (Vector3.up + Vector3.left);
+        Draw.DrawLineRend(mLrLGuide, line);
 
         mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
         mLrRGuide.useWorldSpace = false;
-        Draw.DrawLine(mLrRGuide, new Vector2(0, 0), new Vector2(-100, 100));
+        line[1] = 100 * (Vector3.up + Vector3.right);
+        Draw.DrawLineRend(mLrRGuide, line);
 
         mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
         mLrCGuide.useWorldSpace = false;
-        Draw.DrawLine(mLrCGuide, new Vector2(0, 0), new Vector2(0, 100));
+        line[1] = 100 * (Vector3.up);
+        Draw.DrawLineRend(mLrCGuide, line);
 
         EnableGuides(false);
 
@@ -108,8 +113,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)
         {
-            Trig.Line line = new Trig.Line(dir.origin, Trig.NearestPointOnLine(dir, pnt));
-            Draw.DrawLine(mLrMove, line);
+            LinePath line = new LinePath(dir, Trig.NearestPointOnLine(dir, pnt));
+            Draw.DrawLineRend(mLrMove, line.RenderPoints());
 
             // Place Ghost
             myGhost.SetPos(line.End, Quaternion.identity);
@@ -117,9 +122,9 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Else Arc
         else
         {
-            Trig.Arc arc = Trig.GetArc(dir, pnt);
-            Draw.DrawArc(mLrMove, arc, 20);
-            float ghRot = Vector2.SignedAngle(dir.direction, arc.FinalDir);
+            ArcPath arc = new ArcPath(dir, pnt);
+            Draw.DrawLineRend(mLrMove, arc.RenderPoints());
+            float ghRot = Vector2.SignedAngle(dir.direction, arc.EndDir);
 
             // Place Ghost
             myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));

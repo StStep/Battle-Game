@@ -98,7 +98,9 @@ public class LinePath : Path
         End = pnt;
         mLength = Vector2.Distance(Start, End);
 
-        // TODO Check validity?
+        Vector2 tmpEnd = Start + mLength * StartDir;
+        if (Vector2.Distance(End, tmpEnd) > float.Epsilon)
+            throw new Exception("Invalid line");
     }
 }
 
@@ -173,17 +175,6 @@ public class ArcPath : Path
 /// </summary>
 public static class Trig
 {
-
-    public struct Line
-    {
-        public Vector2 Start, End;
-        public Line(Vector2 strt, Vector2 end)
-        {
-            Start = strt;
-            End = end;
-        }
-
-    }
 
     public struct Arc
     {
@@ -327,36 +318,10 @@ public static class Draw
         return lr;
     }
 
-    public static void DrawLine(LineRenderer lr, Trig.Line line)
+    public static void DrawLineRend(LineRenderer lr, Vector3[] pnts)
     {
-        DrawLine(lr, line.Start, line.End);
+        lr.positionCount = pnts.Length;
+        lr.SetPositions(pnts);
     }
 
-    public static void DrawLine(LineRenderer lr, Vector2 strt, Vector2 end)
-    {
-        lr.positionCount = 2;
-        lr.SetPosition(0, new Vector3(strt.x, strt.y));
-        lr.SetPosition(1, new Vector3(end.x, end.y));
-    }
-
-    public static void DrawArc(LineRenderer lr, Trig.Arc arc, int seg)
-    {
-        int segments = 20;
-        lr.positionCount = segments + 1;
-        float rawAngle = Vector2.SignedAngle(arc.Start - arc.Center, arc.End - arc.Center);
-        bool clockwise = (rawAngle < 0);
-        float angle = (clockwise) ? -90 : 90;
-        float arcLength = Mathf.Abs(rawAngle);
-        float radius = Mathf.Abs(Vector2.Distance(arc.Start, arc.Center));
-        for (int i = 0; i <= segments; i++)
-        {
-            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
-            float y = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
-
-            lr.SetPosition(i, new Vector3(x + arc.Center.x, y + arc.Center.y));
-
-            angle += (clockwise) ? (arcLength / segments) : -(arcLength / segments);
-        }
-        lr.SetPosition(segments, arc.End);
-    }
 }
