@@ -155,7 +155,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         else
         {
             curPath = new ArcPath(dir, pnt);
-            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
+            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.DebugRenderPoints());
 
             // Place Ghost
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);

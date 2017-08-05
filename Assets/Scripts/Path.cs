@@ -46,6 +46,11 @@ public abstract class Path
         Recalculate(pnt);
     }
 
+    public virtual Vector3[] DebugRenderPoints()
+    {
+        return RenderPoints();
+    }
+
     abstract public Vector3[] RenderPoints();
 
     abstract public Vector2 GetPoint(float dist);
@@ -192,6 +197,17 @@ public class ArcPath : Path
             angle += (clockwise) ? (arcLength / segments) : -(arcLength / segments);
         }
         pnts[segments] = End;
+
+        return pnts;
+    }
+
+    public override Vector3[] DebugRenderPoints()
+    {
+        Vector3[] pnts = new Vector3[3];
+
+        pnts[0] = Start;
+        pnts[1] = mCenter;
+        pnts[2] = End;
 
         return pnts;
     }
