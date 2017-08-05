@@ -18,7 +18,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private GuiGhost myGhost;
 
     // Lines, dynamic
-    private LineRenderer mLrMove;
+    private List<LineRenderer> mLrMoves;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
@@ -38,12 +38,14 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         // Selector
         mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
+        mLrMoves = new List<LineRenderer>();
 
         // Make lines
-        mLrMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
+        LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
+        mLrMoves.Add(curMove);
+
         Vector3[] line = new Vector3[2];
         line[0] = Vector3.zero;
-
         mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
         mLrLGuide.useWorldSpace = false;
         line[1] = 100 * (Vector3.up + Vector3.left);
@@ -93,7 +95,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonDown(1))
         {
             mState = State.None;
-            mLrMove.positionCount = 0;
+            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
             myGhost.Show(false);
             return;
         }
@@ -108,28 +110,28 @@ public class GuiUnit : MonoBehaviour, ISelectable
         Trig.Quarter qrt = Trig.GetQuarter(dir, pnt, 0, 0);
         if (qrt == Trig.Quarter.back)
         {
-            mLrMove.positionCount = 0;
+            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
             myGhost.SetPos(pnt, Quaternion.identity);
         }
         // If left, bend to edge
         else if (qrt == Trig.Quarter.left)
         {
             // TODO
-            mLrMove.positionCount = 0;
+            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
             myGhost.SetPos(pnt, Quaternion.identity);
         }
         // If right, bend to edge
         else if (qrt == Trig.Quarter.right)
         {
             // TODO
-            mLrMove.positionCount = 0;
+            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
             myGhost.SetPos(pnt, Quaternion.identity);
         }
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)
         {
             LinePath line = new LinePath(dir, Trig.NearestPointOnLine(dir, pnt));
-            Draw.DrawLineRend(mLrMove, line.RenderPoints());
+            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], line.RenderPoints());
 
             // Place Ghost
             myGhost.SetPos(line.End, Quaternion.identity);
@@ -138,14 +140,19 @@ public class GuiUnit : MonoBehaviour, ISelectable
         else
         {
             ArcPath arc = new ArcPath(dir, pnt);
-            Draw.DrawLineRend(mLrMove, arc.RenderPoints());
+            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], arc.RenderPoints());
             float ghRot = Vector2.SignedAngle(dir.direction, arc.EndDir);
 
             // Place Ghost
             myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
 
-        // TODO If left Click Finalize state
+        // If left Click Add Movement Segment
+        if (Input.GetMouseButtonDown(0))
+        {
+            LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
+            mLrMoves.Add(curMove);
+        }
     }
 
     #endregion
@@ -189,16 +196,22 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
 
         // Left Click
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(0))
+        {
             LeftClick();
+        }
  
         // Right Click
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonUp(1))
+        {
             RightClick();
+        }
 
         // Middle Click
-        if (Input.GetMouseButtonDown(2))
+        if (Input.GetMouseButtonUp(2))
+        {
             Debug.Log("Pressed middle click.");
+        }
     }
 
     public void LeftClick()
