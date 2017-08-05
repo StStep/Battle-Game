@@ -43,23 +43,35 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mLrMoves = new List<LineRenderer>();
         mPaths = new List<Path>();
 
-        // Move Vars
-        PointPath strPath = new PointPath(new Ray2D(this.transform.position, this.transform.up), this.transform.position);
-        mPaths.Add(strPath);
-
-        // Make lines
-        LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
-        mLrMoves.Add(curMove);
-
         mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
         mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
         mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
 
+        //  Set Startup info
+        EnableGuides(false);
+        ResetPath();
+        Deselect();
+    }
+
+    private void ResetPath()
+    {
         MoveGuides(this.transform.position, this.transform.up);
 
-        EnableGuides(false);
+        // Make Paths
+        mPaths.Clear();
+        PointPath strPath = new PointPath(new Ray2D(this.transform.position, this.transform.up), this.transform.position);
+        mPaths.Add(strPath);
 
-        Deselect();
+        // Clear Existing objects
+        foreach(LineRenderer lr in mLrMoves)
+        {
+            Destroy(lr);
+        }
+        mLrMoves.Clear();
+
+        // Make Lines
+        LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
+        mLrMoves.Add(curMove);
     }
 
     private void MoveGuides(Vector2 origin, Vector2 direction)
@@ -163,10 +175,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
 
         // If left Click Add Movement Segment
-        if (Input.GetMouseButtonDown(0))
+        if (curPath != null && Input.GetMouseButtonDown(0))
         {
-            //mPaths.Add(curPath);
-            //MoveGuides(curPath.End, curPath.EndDir);
+            mPaths.Add(curPath);
+            MoveGuides(curPath.End, curPath.EndDir);
             LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
             mLrMoves.Add(curMove);
         }
@@ -216,6 +228,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonUp(0))
         {
             LeftClick();
+            ResetPath();
         }
  
         // Right Click
