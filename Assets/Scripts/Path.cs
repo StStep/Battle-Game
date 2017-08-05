@@ -53,6 +53,20 @@ public abstract class Path
     abstract protected void Translate(Ray2D dir);
 
     abstract protected void Recalculate(Vector2 pnt);
+
+    public virtual void LocalToWorld(Transform refT)
+    {
+        StartDir = refT.TransformDirection(StartDir);
+        Start = refT.TransformPoint(Start);
+        End = refT.TransformPoint(End);
+    }
+
+    public virtual void WorldToLocal(Transform refT)
+    {
+        StartDir = refT.InverseTransformDirection(StartDir);
+        Start = refT.InverseTransformPoint(Start);
+        End = refT.InverseTransformPoint(End);
+    }
 }
 
 public class PointPath : Path
@@ -95,6 +109,7 @@ public class PointPath : Path
 
 public class LinePath : Path
 {
+    // Transform Agnostic Info
     float mLength;
 
     override public Vector2 EndDir
@@ -141,14 +156,18 @@ public class LinePath : Path
 
 public class ArcPath : Path
 {
-    protected Trig.Arc mArc;
+    // Transform Agnostic Info
     protected float mRawAngle;
     protected float mArcLength;
     protected float mRadius;
 
+    // Transform dependent info
+    protected Vector2 mCenter;
+    protected Vector2 mFinalDir;
+
     override public Vector2 EndDir
     {
-        get { return mArc.FinalDir; }
+        get { return mFinalDir; }
         protected set { }
     }
 
@@ -168,7 +187,7 @@ public class ArcPath : Path
             float x = Mathf.Sin(Mathf.Deg2Rad * angle) * mRadius;
             float y = Mathf.Cos(Mathf.Deg2Rad * angle) * mRadius;
 
-            pnts[i] = new Vector3(x + mArc.Center.x, y + mArc.Center.y, 0f);
+            pnts[i] = new Vector3(x + mCenter.x, y + mCenter.y, 0f);
 
             angle += (clockwise) ? (arcLength / segments) : -(arcLength / segments);
         }
@@ -197,11 +216,27 @@ public class ArcPath : Path
 
     protected override void Recalculate(Vector2 pnt)
     {
-        mArc = Trig.GetArc(new Ray2D(Start, StartDir), pnt);
+        Trig.Arc arc = Trig.GetArc(new Ray2D(Start, StartDir), pnt);
+        mCenter = arc.Center;
+        mFinalDir = arc.FinalDir;
         End = pnt;
 
-        mRawAngle = Vector2.SignedAngle(mArc.Start - mArc.Center, mArc.End - mArc.Center);
-        mRadius = Mathf.Abs(Vector2.Distance(mArc.Start, mArc.Center));
+        mRawAngle = Vector2.SignedAngle(Start - mCenter, End - mCenter);
+        mRadius = Mathf.Abs(Vector2.Distance(Start, mCenter));
         mArcLength = 2 * Mathf.PI * mRadius * (Mathf.Abs(mRawAngle) / 360f);
+    }
+
+    public override void LocalToWorld(Transform refT)
+    {
+        base.LocalToWorld(refT);
+        mFinalDir = refT.TransformDirection(mFinalDir);
+        mCenter = refT.TransformPoint(mCenter);
+    }
+
+    public override void WorldToLocal(Transform refT)
+    {
+        base.WorldToLocal(refT);
+        mFinalDir = refT.InverseTransformDirection(mFinalDir);
+        mCenter = refT.InverseTransformPoint(mCenter);
     }
 }

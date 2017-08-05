@@ -158,7 +158,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
             Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
 
             // Place Ghost
-            float ghRot = Vector2.SignedAngle(dir.direction, curPath.EndDir);
+            float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
             myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
 
