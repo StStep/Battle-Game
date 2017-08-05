@@ -103,12 +103,27 @@ public class GuiUnit : MonoBehaviour, ISelectable
         pnt.z = transform.position.z; // Set Z
         Ray2D dir = new Ray2D(transform.position, transform.up);
 
-        // Check Invalid Arc
+        // If in Back Arc, nothing
         myGhost.Show(true);
-        if (!Trig.WithinFrontArc(dir, pnt, 0))
+        Trig.Quarter qrt = Trig.GetQuarter(dir, pnt, 0, 0);
+        if (qrt == Trig.Quarter.back)
         {
             mLrMove.positionCount = 0;
-            myGhost.Show(false);
+            myGhost.SetPos(pnt, Quaternion.identity);
+        }
+        // If left, bend to edge
+        else if (qrt == Trig.Quarter.left)
+        {
+            // TODO
+            mLrMove.positionCount = 0;
+            myGhost.SetPos(pnt, Quaternion.identity);
+        }
+        // If right, bend to edge
+        else if (qrt == Trig.Quarter.right)
+        {
+            // TODO
+            mLrMove.positionCount = 0;
+            myGhost.SetPos(pnt, Quaternion.identity);
         }
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)

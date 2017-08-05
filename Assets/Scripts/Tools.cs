@@ -36,7 +36,7 @@ public static class Trig
     }
 
     // TODO use frontage
-    public static bool WithinFrontArc(Ray2D dir, Vector2 pnt, float frontage)
+    public static bool WithinFrontQuarter(Ray2D dir, Vector2 pnt, float frontage)
     {
         bool ret = true;
 
@@ -44,6 +44,26 @@ public static class Trig
         float ang = Vector2.Angle(v, dir.direction);
         if (ang > 45F)
             ret = false;
+
+        return ret;
+    }
+
+    public enum Quarter {front, back, left, right};
+    public static Quarter GetQuarter(Ray2D dir, Vector2 pnt, float frontage, float sideage)
+    {
+        Quarter ret;
+
+        Vector2 v = pnt - dir.origin;
+        float ang = Vector2.SignedAngle(v, dir.direction);
+        float absAng = Mathf.Abs(ang);
+        if (absAng <= 45F)
+            ret = Quarter.front;
+        else if(absAng >= 135F)
+            ret = Quarter.back;
+        else if(ang < 0)
+            ret = Quarter.left;
+        else
+            ret = Quarter.right;
 
         return ret;
     }
@@ -88,7 +108,7 @@ public static class Trig
     public static Arc GetArc(Ray2D dir, Vector2 pnt)
     {
         // Invalid if pnt is in back half of dir
-        if(!WithinFrontArc(dir, pnt, 0))
+        if(!WithinFrontQuarter(dir, pnt, 0))
             throw new System.Exception("Outside bounds");
 
         // LegA of isolese triangle is perp to dir

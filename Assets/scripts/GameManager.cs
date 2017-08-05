@@ -7,6 +7,10 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    // Constants
+    public const float TIME_PER_TURN = 20f;
+    public const float DEFAULT_SPEED = 8f / TIME_PER_TURN;
+
 
     /// <summary>
     /// The single current instance of this class
