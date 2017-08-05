@@ -134,8 +134,8 @@ public class LinePath : Path
         mLength = Vector2.Distance(Start, End);
 
         Vector2 tmpEnd = Start + mLength * StartDir;
-        if (Vector2.Distance(End, tmpEnd) > float.Epsilon)
-            throw new Exception("Invalid line");
+        if (tmpEnd != End)
+            throw new Exception(String.Format("Invalid line Calc {0} vs Actual {1}", End, tmpEnd));
     }
 }
 

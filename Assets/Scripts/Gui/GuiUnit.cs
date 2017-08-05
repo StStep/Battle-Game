@@ -148,16 +148,17 @@ public class GuiUnit : MonoBehaviour, ISelectable
             Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
 
             // Place Ghost
-            myGhost.SetPos(curPath.End, Quaternion.identity);
+            float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
+            myGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
         // Else Arc
         else
         {
             curPath = new ArcPath(dir, pnt);
             Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
-            float ghRot = Vector2.SignedAngle(dir.direction, curPath.EndDir);
 
             // Place Ghost
+            float ghRot = Vector2.SignedAngle(dir.direction, curPath.EndDir);
             myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
 
@@ -165,6 +166,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonDown(0))
         {
             //mPaths.Add(curPath);
+            //MoveGuides(curPath.End, curPath.EndDir);
             LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
             mLrMoves.Add(curMove);
         }
