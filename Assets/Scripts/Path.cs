@@ -184,17 +184,12 @@ public class ArcPath : Path
         const int segments = 20;
         Vector3[] pnts = new Vector3[segments + 1];
 
-        bool clockwise = (mRawAngle < 0);
-        float angle = (clockwise) ? -90 : 90;
-        float arcLength = Mathf.Abs(mRawAngle);
-        for (int i = 0; i <= segments; i++)
+        float cDist = 0;
+        float diff = mArcLength / segments;
+        for (int i = 0; i < segments; i++)
         {
-            float x = Mathf.Sin(Mathf.Deg2Rad * angle) * mRadius;
-            float y = Mathf.Cos(Mathf.Deg2Rad * angle) * mRadius;
-
-            pnts[i] = new Vector3(x + mCenter.x, y + mCenter.y, 0f);
-
-            angle += (clockwise) ? (arcLength / segments) : -(arcLength / segments);
+            pnts[i] = GetPoint(cDist);
+            cDist += diff;
         }
         pnts[segments] = End;
 
@@ -217,12 +212,30 @@ public class ArcPath : Path
         if (dist > mArcLength)
             throw new Exception("Length outside bounds");
 
-        float angle = (dist / mArcLength) * Mathf.Abs(mRawAngle);
+        float angle = (dist / mArcLength) * mRawAngle;
 
-        float x = Mathf.Sin(Mathf.Deg2Rad * angle) * mRadius;
-        float y = Mathf.Cos(Mathf.Deg2Rad * angle) * mRadius;
+        float x = Mathf.Cos(Mathf.Deg2Rad * angle) * mRadius;
+        float y = Mathf.Sin(Mathf.Deg2Rad * angle) * mRadius;
+        Vector2 pnt = new Vector2(x, y);
 
-        return new Vector2(x, y);
+        // Rotate appropriately
+        Vector2 cord = End - Start;
+        float bodyAng = Vector2.SignedAngle(Vector2.up, StartDir);
+        float pntAng = Vector2.SignedAngle(StartDir, cord);
+        if(pntAng > 0)
+        {
+            pnt = Quaternion.AngleAxis(bodyAng, Vector3.forward) * pnt;
+        }
+        else
+        {
+            pnt = Quaternion.AngleAxis(bodyAng - 180, Vector3.forward) * pnt;
+        }
+
+        // Add center offset
+        pnt.x += mCenter.x;
+        pnt.y += mCenter.y;
+
+        return pnt;
     }
 
     protected override void Translate(Ray2D dir)
