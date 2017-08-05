@@ -55,6 +55,44 @@ public abstract class Path
     abstract protected void Recalculate(Vector2 pnt);
 }
 
+public class PointPath : Path
+{
+    override public Vector2 EndDir
+    {
+        get { return StartDir; }
+        protected set { }
+    }
+
+    public PointPath(Ray2D dir, Vector2 pnt) : base(dir, pnt)
+    { }
+
+    public override Vector3[] RenderPoints()
+    {
+        Vector3[] pnts = new Vector3[1];
+        pnts[0] = new Vector3(Start.x, Start.y, 0f);
+        return pnts;
+    }
+
+    public override Vector2 GetPoint(float dist)
+    {
+        if (dist > float.Epsilon)
+            throw new Exception("Length outside bounds");
+        return Start;
+    }
+
+    protected override void Translate(Ray2D dir)
+    {
+        Start = dir.origin;
+        StartDir = dir.direction;
+        End = Start;
+    }
+
+    protected override void Recalculate(Vector2 pnt)
+    {
+        End = Start;
+    }
+}
+
 public class LinePath : Path
 {
     float mLength;

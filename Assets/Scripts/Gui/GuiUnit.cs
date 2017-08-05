@@ -23,6 +23,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
 
+    // Current Movement Info
+    private List<Path> mPaths;
 
     // Use this for initialization
     public void Start()
@@ -39,31 +41,43 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Selector
         mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
         mLrMoves = new List<LineRenderer>();
+        mPaths = new List<Path>();
+
+        // Move Vars
+        PointPath strPath = new PointPath(new Ray2D(this.transform.position, this.transform.up), this.transform.position);
+        mPaths.Add(strPath);
 
         // Make lines
         LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
         mLrMoves.Add(curMove);
 
-        Vector3[] line = new Vector3[2];
-        line[0] = Vector3.zero;
         mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
-        mLrLGuide.useWorldSpace = false;
-        line[1] = 100 * (Vector3.up + Vector3.left);
-        Draw.DrawLineRend(mLrLGuide, line);
-
         mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
-        mLrRGuide.useWorldSpace = false;
-        line[1] = 100 * (Vector3.up + Vector3.right);
-        Draw.DrawLineRend(mLrRGuide, line);
-
         mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
-        mLrCGuide.useWorldSpace = false;
-        line[1] = 100 * (Vector3.up);
-        Draw.DrawLineRend(mLrCGuide, line);
+
+        MoveGuides(this.transform.position, this.transform.up);
 
         EnableGuides(false);
 
         Deselect();
+    }
+
+    private void MoveGuides(Vector2 origin, Vector2 direction)
+    {
+        Vector3[] line = new Vector3[2];
+        line[0] = origin;
+
+        line[1] = 100 * direction;
+        line[1] += line[0];
+        Draw.DrawLineRend(mLrCGuide, line);
+
+        Vector3 rightGuideDir = Quaternion.AngleAxis(-45f, Vector3.forward) * direction;
+        line[1] = 100 * rightGuideDir + line[0];
+        Draw.DrawLineRend(mLrRGuide, line);
+
+        Vector3 leftGuideDir = Quaternion.AngleAxis(45f, Vector3.forward) * direction;
+        line[1] = 100 * leftGuideDir + line[0];
+        Draw.DrawLineRend(mLrLGuide, line);
     }
 
     private void EnableGuides(bool en)
@@ -71,7 +85,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mLrLGuide.enabled = en;
         mLrRGuide.enabled = en;
         mLrCGuide.enabled = en;
-
     }
 
     // Update is called once per frame
@@ -103,7 +116,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Draw  Path
         Vector3 pnt = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         pnt.z = transform.position.z; // Set Z
-        Ray2D dir = new Ray2D(transform.position, transform.up);
+        Ray2D dir = new Ray2D(mPaths[mPaths.Count - 1].End, mPaths[mPaths.Count - 1].EndDir);
+        Path curPath = null;
 
         // If in Back Arc, nothing
         myGhost.Show(true);
@@ -130,18 +144,18 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)
         {
-            LinePath line = new LinePath(dir, Trig.NearestPointOnLine(dir, pnt));
-            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], line.RenderPoints());
+            curPath = new LinePath(dir, Trig.NearestPointOnLine(dir, pnt));
+            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
 
             // Place Ghost
-            myGhost.SetPos(line.End, Quaternion.identity);
+            myGhost.SetPos(curPath.End, Quaternion.identity);
         }
         // Else Arc
         else
         {
-            ArcPath arc = new ArcPath(dir, pnt);
-            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], arc.RenderPoints());
-            float ghRot = Vector2.SignedAngle(dir.direction, arc.EndDir);
+            curPath = new ArcPath(dir, pnt);
+            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
+            float ghRot = Vector2.SignedAngle(dir.direction, curPath.EndDir);
 
             // Place Ghost
             myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));
@@ -150,6 +164,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // If left Click Add Movement Segment
         if (Input.GetMouseButtonDown(0))
         {
+            //mPaths.Add(curPath);
             LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
             mLrMoves.Add(curMove);
         }
