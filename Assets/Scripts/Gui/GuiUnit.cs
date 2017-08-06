@@ -4,54 +4,72 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(Collider2D), typeof(Sprite))]
+[RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
 public class GuiUnit : MonoBehaviour, ISelectable
 {
+    // Types
     enum State {None, Moving};
 
-    private bool mSel = false;
-    private State mState = State.None;
+    // Status Member
+    private bool mSel;
+    private State mState;
     private Selector mSelector;
 
-    // Prefab items
+    // Components
     private SpriteRenderer mySpriteRend;
-    private GuiGhost myGhost;
 
-    // Lines, dynamic
-    private List<LineRenderer> mLrMoves;
+    // Static Objects
+    private GuiGhost myGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
 
-    // Current Movement Info
+    // Dynamic Objects
+    private List<LineRenderer> mLrMoves;
     private List<Path> mPaths;
 
     // Use this for initialization
     public void Start()
     {
-        // Prefab items
+        // Components
         mySpriteRend = GetComponent<SpriteRenderer>();
-        this.myGhost = GetComponentInChildren(typeof(GuiGhost)) as GuiGhost;
-        if(this.myGhost == null)
-        {
-            Debug.LogError("No ghost object found.");
-        }
-        this.myGhost.Show(false);
 
-        // Selector
+        // Status Members
         mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
-        mLrMoves = new List<LineRenderer>();
-        mPaths = new List<Path>();
+        mState = State.None;
+        mSel = false;
 
+        // Static Init
         mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
         mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
         mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
+        myGhost = MakeGhost();
+        myGhost.Show(false);
 
-        //  Set Startup info
+        // Dyanimic Init
+        mLrMoves = new List<LineRenderer>();
+        mPaths = new List<Path>();
+
+        // Startup Functions
         EnableGuides(false);
         ResetPath();
         Deselect();
     }
+
+    // Update is called once per frame
+    public void Update()
+    {
+        switch (mState)
+        {
+            case State.Moving:
+                StMove();
+                break;
+            default:
+                break;
+        }
+    }
+
+    #region Utility
 
     private void ResetPath()
     {
@@ -99,18 +117,30 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mLrCGuide.enabled = en;
     }
 
-    // Update is called once per frame
-    public void Update()
+    private GuiGhost MakeGhost()
     {
-        switch (mState)
-        {
-            case State.Moving:
-                StMove();
-                break;
-            default:
-                break;
-        }
+        GameObject g = new GameObject();
+        g.name = "Ghost";
+        g.transform.parent = transform;
+        g.transform.localPosition = Vector3.zero + Vector3.back;
+        g.AddComponent<SpriteRenderer>();
+        g.AddComponent<BoxCollider2D>();
+        g.AddComponent<GuiGhost>();
+
+        // Box Collider Init
+        SpriteRenderer sr = g.GetComponent<SpriteRenderer>();
+        SpriteRenderer mSr = this.GetComponent<SpriteRenderer>();
+        sr.sprite = mSr.sprite;
+
+        // Box Collider Init
+        BoxCollider2D bc = g.GetComponent<BoxCollider2D>();
+        BoxCollider2D mBc = this.GetComponent<BoxCollider2D>();
+        bc.size = mBc.size;
+
+        return g.GetComponent<GuiGhost>();
     }
+
+    #endregion
 
     #region States
 
@@ -133,48 +163,47 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         // If in Back Arc, nothing
         myGhost.Show(true);
+        myGhost.Bad();
         Trig.Quarter qrt = Trig.GetQuarter(dir, pnt, 0, 0);
         if (qrt == Trig.Quarter.back)
         {
-            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
-            myGhost.SetPos(pnt, Quaternion.identity);
         }
         // If left, bend to edge
         else if (qrt == Trig.Quarter.left)
         {
-            // TODO
-            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
-            myGhost.SetPos(pnt, Quaternion.identity);
         }
         // If right, bend to edge
         else if (qrt == Trig.Quarter.right)
         {
-            // TODO
-            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
-            myGhost.SetPos(pnt, Quaternion.identity);
         }
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)
         {
             curPath = new LinePath(dir, Trig.NearestPointOnLine(dir, pnt));
-            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
-
-            // Place Ghost
-            float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
-            myGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
         // Else Arc
         else
         {
             curPath = new ArcPath(dir, pnt);
+        }
+
+        if(curPath != null)
+        {
+            // Render
             Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
 
             // Place Ghost
+            myGhost.Good();
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
-            myGhost.SetPos(pnt, Quaternion.AngleAxis(ghRot, Vector3.forward));
+            myGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
+        }
+        else
+        {
+            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+            myGhost.SetPos(pnt, Quaternion.identity);
         }
 
-        // If left Click Add Movement Segment
+        // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
             mPaths.Add(curPath);

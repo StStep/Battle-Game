@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+[RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
 public class GuiGhost : MonoBehaviour
 {
+    // Components
+    private SpriteRenderer mySpriteRend;
+
     // Use this for initialization
     public void Start ()
     {
-        ;
+        mySpriteRend = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -20,6 +24,18 @@ public class GuiGhost : MonoBehaviour
     public void Show(bool en)
     {
         gameObject.SetActive(en);
+    }
+
+    public void Bad()
+    {
+        if(mySpriteRend != null)
+            mySpriteRend.color = Color.red - new Color(0, 0, 0, .7f);
+    }
+
+    public void Good()
+    {
+        if (mySpriteRend != null)
+            mySpriteRend.color = Color.green - new Color(0, 0, 0, .7f);
     }
 
     public void SetPos(Vector3 pos, Quaternion rot)
