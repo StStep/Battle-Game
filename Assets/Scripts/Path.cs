@@ -102,7 +102,7 @@ public class PointPath : Path
         protected set { }
     }
 
-    public PointPath(Ray2D dir, Vector2 pnt) : base(dir, pnt)
+    public PointPath(Ray2D dir) : base(dir, Vector2.zero)
     { }
 
     public override Vector3[] RenderPoints()

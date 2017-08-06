@@ -36,7 +36,7 @@ public class SimCmd {
     public void Reset(Ray2D dir)
     {
         mPaths.Clear();
-        mPaths.Add(new PointPath(dir, Vector2.zero));
+        mPaths.Add(new PointPath(dir));
         TimeSpent = 0;
     }
 
