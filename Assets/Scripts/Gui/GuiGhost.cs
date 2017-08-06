@@ -4,16 +4,23 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
-public class GuiGhost : MonoBehaviour
+public class GuiGhost : MonoBehaviour, IClickRef
 {
     // Components
     private SpriteRenderer mySpriteRend;
 
+    // Delegates
+    private Click mLeftDel;
+    private Click mRightDel;
+
     // Use this for initialization
-    public void Start ()
+    public void Awake ()
     {
         mySpriteRend = GetComponent<SpriteRenderer>();
         Neutral();
+
+        mLeftDel = null;
+        mRightDel = null;
     }
 
     // Update is called once per frame
@@ -29,20 +36,17 @@ public class GuiGhost : MonoBehaviour
 
     public void Neutral()
     {
-        if (mySpriteRend != null)
-            mySpriteRend.color = Color.white;
+        mySpriteRend.color = Color.white;
     }
 
     public void Bad()
     {
-        if(mySpriteRend != null)
-            mySpriteRend.color = Color.red - new Color(0, 0, 0, .7f);
+        mySpriteRend.color = Color.red - new Color(0, 0, 0, .7f);
     }
 
     public void Good()
     {
-        if (mySpriteRend != null)
-            mySpriteRend.color = Color.green - new Color(0, 0, 0, .7f);
+        mySpriteRend.color = Color.green - new Color(0, 0, 0, .7f);
     }
 
     public void SetPos(Vector3 pos, Quaternion rot)
@@ -50,6 +54,22 @@ public class GuiGhost : MonoBehaviour
         transform.position = pos;
         transform.rotation = rot;
     }
+
+    #region IClickRef
+    //////////////////////// IClickRef ///////////////////////////////
+
+    public void SetLeft(Click del)
+    {
+        mLeftDel = del;
+    }
+
+    public void SetRight(Click del)
+    {
+        mRightDel = del;
+    }
+
+    /////////////////////////////////////////////////////////////////
+    #endregion
 
     #region MouseIF
     //////////////////////// MouseIF ///////////////////////////////
@@ -63,15 +83,15 @@ public class GuiGhost : MonoBehaviour
         }
 
         // Left Click
-        if (Input.GetMouseButtonUp(0))
+        if (mLeftDel != null && Input.GetMouseButtonUp(0))
         {
-            LeftClick();
+            mLeftDel();
         }
 
         // Right Click
-        if (Input.GetMouseButtonUp(1))
+        if (mRightDel != null && Input.GetMouseButtonUp(1))
         {
-            RightClick();
+            mRightDel();
         }
 
         // Middle Click
@@ -81,15 +101,6 @@ public class GuiGhost : MonoBehaviour
         }
     }
 
-    public void LeftClick()
-    {
-        ;
-    }
-
-    public void RightClick()
-    {
-        ;
-    }
     /////////////////////////////////////////////////////////////////////
     #endregion
 }

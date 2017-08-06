@@ -48,6 +48,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mCursorGhost.Show(false);
         mMoveGhost = MakeGhost();
         mMoveGhost.Show(false);
+        mMoveGhost.SetLeft(SelectMove);
 
         // Dyanimic Init
         mLrMoves = new List<LineRenderer>();
@@ -147,6 +148,32 @@ public class GuiUnit : MonoBehaviour, ISelectable
         return g.GetComponent<GuiGhost>();
     }
 
+    public void SelectMove()
+    {
+        if (!mSel)
+        {
+            mSelector.ChainSelect();
+        }
+
+        if (mSel)
+        {
+            if (mState == State.None)
+            {
+                mState = State.Moving; // Defualt to moving after selecting
+            }
+        }
+    }
+
+    public void SelectRotate()
+    {
+        if (!mSel)
+        {
+            mSelector.ChainSelect();
+        }
+
+        // TODO Rotate
+    }
+
     #endregion
 
     #region States
@@ -223,7 +250,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
     #endregion
 
-
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
@@ -264,14 +290,14 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Left Click
         if (Input.GetMouseButtonUp(0))
         {
-            LeftClick();
+            SelectMove();
             ResetPath();
         }
  
         // Right Click
         if (Input.GetMouseButtonUp(1))
         {
-            RightClick();
+            SelectRotate();
         }
 
         // Middle Click
@@ -281,31 +307,6 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
     }
 
-    public void LeftClick()
-    {
-        if(!mSel)
-        {
-            mSelector.ChainSelect();
-        }
-
-        if (mSel)
-        {
-            if (mState == State.None)
-            {
-                mState = State.Moving; // Defualt to moving after selecting
-            }
-        }
-    }
-
-    public void RightClick()
-    {
-        if (!mSel)
-        {
-            mSelector.ChainSelect();
-        }
-
-        // TODO Rotate
-    }
     /////////////////////////////////////////////////////////////////////
     #endregion
 }
