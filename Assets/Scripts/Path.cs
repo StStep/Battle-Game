@@ -35,6 +35,12 @@ public abstract class Path
         protected set;
     }
 
+    abstract public float Length
+    {
+        get;
+        protected set;
+    }
+
     public Path(Ray2D dir, Vector2 pnt)
     {
         // Set Minimum input
@@ -82,6 +88,12 @@ public class PointPath : Path
         protected set { }
     }
 
+    override public float Length
+    {
+        get { return 0; }
+        protected set { }
+    }
+
     public PointPath(Ray2D dir, Vector2 pnt) : base(dir, pnt)
     { }
 
@@ -120,6 +132,12 @@ public class LinePath : Path
     override public Vector2 EndDir
     {
         get { return StartDir; }
+        protected set { }
+    }
+
+    override public float Length
+    {
+        get { return mLength; }
         protected set { }
     }
 
@@ -173,6 +191,12 @@ public class ArcPath : Path
     override public Vector2 EndDir
     {
         get { return mFinalDir; }
+        protected set { }
+    }
+
+    override public float Length
+    {
+        get { return mArcLength; }
         protected set { }
     }
 

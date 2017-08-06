@@ -24,6 +24,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
+    private SimUnit mSim;
 
     // Dynamic Objects
     private List<LineRenderer> mLrMoves;
@@ -49,6 +50,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mMoveGhost = MakeGhost();
         mMoveGhost.Show(false);
         mMoveGhost.SetLeft(SelectMove);
+        mSim = new SimUnit();
 
         // Dyanimic Init
         mLrMoves = new List<LineRenderer>();
@@ -233,6 +235,19 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
         else
         {
+            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+            mCursorGhost.SetPos(pnt, Quaternion.identity);
+        }
+
+        // Check total length, TODO Could be cached
+        float length = 0;
+        foreach (Path p in mPaths)
+            length += p.Length;
+
+        if (curPath != null && length + curPath.Length > mSim.Speed * GameManager.TIME_PER_TURN)
+        {
+            curPath = null;
+            mCursorGhost.Bad();
             mLrMoves[mLrMoves.Count - 1].positionCount = 0;
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
