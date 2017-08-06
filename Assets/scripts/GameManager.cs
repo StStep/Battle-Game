@@ -8,8 +8,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     // Constants
-    public const float TIME_PER_TURN = 5f;
-    public const float DEFAULT_SPEED = 2f / TIME_PER_TURN;
+    public const float TIME_PER_TURN = 20f;
+    public const float DEFAULT_SPEED = 4f / TIME_PER_TURN;
 
 
     /// <summary>

@@ -42,7 +42,7 @@ public static class Trig
 
         Vector2 v = pnt - dir.origin;
         float ang = Vector2.Angle(v, dir.direction);
-        if (ang > 45F)
+        if (ang > 45.5F)
             ret = false;
 
         return ret;

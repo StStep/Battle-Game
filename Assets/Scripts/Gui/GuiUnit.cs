@@ -82,7 +82,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         if (mSel)
         {
-            if (mState == State.None)
+            if (mState == State.None && mSimCmd.TimeLeft > float.Epsilon)
             {
                 mState = State.Moving; // Defualt to moving after selecting
             }
@@ -120,22 +120,28 @@ public class GuiUnit : MonoBehaviour, ISelectable
         Ray2D dir = mSimCmd.FinalDir;
         Path curPath = null;
         float timeLeft = mSimCmd.TimeLeft;
-        Debug.Log(timeLeft);
 
         // If in Back Arc, nothing
         mCursorGhost.Show(true);
         mCursorGhost.Bad();
         Trig.Quarter qrt = Trig.GetQuarter(dir, pnt, 0, 0);
-        if (qrt == Trig.Quarter.back)
-        {
-        }
+        // Min Move Distance
+        if (Vector3.Distance(dir.origin, pnt) < .05f)
+        { }
+        // Back Quarter
+        else if (qrt == Trig.Quarter.back)
+        { }
         // If left, bend to edge
         else if (qrt == Trig.Quarter.left)
         {
+            Ray2D guide = new Ray2D(dir.origin, Quaternion.AngleAxis(45f, Vector3.forward) * dir.direction);
+            curPath = new ArcPath(timeLeft, dir, Trig.NearestPointOnLine(guide, pnt));
         }
         // If right, bend to edge
         else if (qrt == Trig.Quarter.right)
         {
+            Ray2D guide = new Ray2D(dir.origin, Quaternion.AngleAxis(-45f, Vector3.forward) * dir.direction);
+            curPath = new ArcPath(timeLeft, dir, Trig.NearestPointOnLine(guide, pnt));
         }
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)
@@ -173,6 +179,9 @@ public class GuiUnit : MonoBehaviour, ISelectable
             if(mSimCmd.TimeLeft < float.Epsilon)
             {
                 mGuiCmd.Fin();
+                mState = State.None;
+                mGuiCmd.Retract();
+                mCursorGhost.Show(false);
             }
         }
     }
@@ -219,8 +228,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Left Click
         if (Input.GetMouseButtonUp(0))
         {
-            SelectMove();
             ResetPath();
+            SelectMove();
         }
  
         // Right Click
