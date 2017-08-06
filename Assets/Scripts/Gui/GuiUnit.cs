@@ -19,7 +19,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private SpriteRenderer mySpriteRend;
 
     // Static Objects
-    private GuiGhost myGhost;
+    private GuiGhost mMoveGhost;
+    private GuiGhost mCursorGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
@@ -43,8 +44,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
         mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
         mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
-        myGhost = MakeGhost();
-        myGhost.Show(false);
+        mCursorGhost = MakeGhost();
+        mCursorGhost.Show(false);
+        mMoveGhost = MakeGhost();
+        mMoveGhost.Show(false);
 
         // Dyanimic Init
         mLrMoves = new List<LineRenderer>();
@@ -74,6 +77,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private void ResetPath()
     {
         MoveGuides(this.transform.position, this.transform.up);
+        mMoveGhost.Show(false);
 
         // Make Paths
         mPaths.Clear();
@@ -108,6 +112,9 @@ public class GuiUnit : MonoBehaviour, ISelectable
         Vector3 leftGuideDir = Quaternion.AngleAxis(45f, Vector3.forward) * direction;
         line[1] = 100 * leftGuideDir + line[0];
         Draw.DrawLineRend(mLrLGuide, line);
+
+        float ghRot = Vector2.SignedAngle(Vector2.up, direction);
+        mMoveGhost.SetPos(origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
     }
 
     private void EnableGuides(bool en)
@@ -151,7 +158,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             mState = State.None;
             mLrMoves[mLrMoves.Count - 1].positionCount = 0;
-            myGhost.Show(false);
+            mCursorGhost.Show(false);
             return;
         }
 
@@ -162,8 +169,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         Path curPath = null;
 
         // If in Back Arc, nothing
-        myGhost.Show(true);
-        myGhost.Bad();
+        mCursorGhost.Show(true);
+        mCursorGhost.Bad();
         Trig.Quarter qrt = Trig.GetQuarter(dir, pnt, 0, 0);
         if (qrt == Trig.Quarter.back)
         {
@@ -193,14 +200,14 @@ public class GuiUnit : MonoBehaviour, ISelectable
             Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
 
             // Place Ghost
-            myGhost.Good();
+            mCursorGhost.Good();
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
-            myGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
+            mCursorGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
         else
         {
             mLrMoves[mLrMoves.Count - 1].positionCount = 0;
-            myGhost.SetPos(pnt, Quaternion.identity);
+            mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
         // If left Click and Path, Add Movement Segment
@@ -208,6 +215,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             mPaths.Add(curPath);
             MoveGuides(curPath.End, curPath.EndDir);
+            mMoveGhost.Show(true);
             LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
             mLrMoves.Add(curMove);
         }

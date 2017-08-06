@@ -13,6 +13,7 @@ public class GuiGhost : MonoBehaviour
     public void Start ()
     {
         mySpriteRend = GetComponent<SpriteRenderer>();
+        Neutral();
     }
 
     // Update is called once per frame
@@ -24,6 +25,12 @@ public class GuiGhost : MonoBehaviour
     public void Show(bool en)
     {
         gameObject.SetActive(en);
+    }
+
+    public void Neutral()
+    {
+        if (mySpriteRend != null)
+            mySpriteRend.color = Color.white;
     }
 
     public void Bad()
@@ -56,16 +63,22 @@ public class GuiGhost : MonoBehaviour
         }
 
         // Left Click
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonUp(0))
+        {
             LeftClick();
+        }
 
         // Right Click
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonUp(1))
+        {
             RightClick();
+        }
 
         // Middle Click
-        if (Input.GetMouseButtonDown(2))
+        if (Input.GetMouseButtonUp(2))
+        {
             Debug.Log("Pressed middle click.");
+        }
     }
 
     public void LeftClick()
