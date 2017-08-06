@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -49,6 +50,5 @@ public class SimCmd {
     {
         return mPaths[mPaths.Count - 1];
     }
-
 
 }

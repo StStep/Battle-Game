@@ -19,16 +19,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private SpriteRenderer mySpriteRend;
 
     // Static Objects
-    private GuiGhost mMoveGhost;
     private GuiGhost mCursorGhost;
-    private LineRenderer mLrLGuide;
-    private LineRenderer mLrRGuide;
-    private LineRenderer mLrCGuide;
     private SimUnit mSim;
     private SimCmd mPaths;
-
-    // Dynamic Objects
-    private List<LineRenderer> mLrMoves;
+    private GuiCmd mLrMoves;
 
     // Use this for initialization
     public void Start()
@@ -42,22 +36,14 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mSel = false;
 
         // Static Init
-        mLrLGuide = Draw.CreateLineRend(gameObject, "LeftGuide", Color.yellow);
-        mLrRGuide = Draw.CreateLineRend(gameObject, "RightGuide", Color.yellow);
-        mLrCGuide = Draw.CreateLineRend(gameObject, "CenterGuide", Color.green);
-        mCursorGhost = MakeGhost();
+        mCursorGhost = Draw.MakeGhost(gameObject);
         mCursorGhost.Show(false);
-        mMoveGhost = MakeGhost();
-        mMoveGhost.Show(false);
-        mMoveGhost.SetLeft(SelectMove);
         mSim = new SimUnit();
-
-        // Dyanimic Init
-        mLrMoves = new List<LineRenderer>();
+        mLrMoves = new GuiCmd(gameObject);
+        mLrMoves.SetLeft(SelectMove);
         mPaths = new SimCmd();
 
         // Startup Functions
-        EnableGuides(false);
         ResetPath();
         Deselect();
     }
@@ -79,73 +65,12 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
     private void ResetPath()
     {
-        MoveGuides(this.transform.position, this.transform.up);
-        mMoveGhost.Show(false);
+        Ray2D dir = new Ray2D(this.transform.position, this.transform.up);
+        // Reset Cmd Sim
+        mPaths.Reset(dir);
 
-        // Make Paths
-        mPaths.Reset(new Ray2D(this.transform.position, this.transform.up));
-
-        // Clear Existing objects
-        foreach(LineRenderer lr in mLrMoves)
-        {
-            Destroy(lr);
-        }
-        mLrMoves.Clear();
-
-        // Make Lines
-        LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
-        mLrMoves.Add(curMove);
-    }
-
-    private void MoveGuides(Vector2 origin, Vector2 direction)
-    {
-        Vector3[] line = new Vector3[2];
-        line[0] = origin;
-
-        line[1] = 100 * direction;
-        line[1] += line[0];
-        Draw.DrawLineRend(mLrCGuide, line);
-
-        Vector3 rightGuideDir = Quaternion.AngleAxis(-45f, Vector3.forward) * direction;
-        line[1] = 100 * rightGuideDir + line[0];
-        Draw.DrawLineRend(mLrRGuide, line);
-
-        Vector3 leftGuideDir = Quaternion.AngleAxis(45f, Vector3.forward) * direction;
-        line[1] = 100 * leftGuideDir + line[0];
-        Draw.DrawLineRend(mLrLGuide, line);
-
-        float ghRot = Vector2.SignedAngle(Vector2.up, direction);
-        mMoveGhost.SetPos(origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
-    }
-
-    private void EnableGuides(bool en)
-    {
-        mLrLGuide.enabled = en;
-        mLrRGuide.enabled = en;
-        mLrCGuide.enabled = en;
-    }
-
-    private GuiGhost MakeGhost()
-    {
-        GameObject g = new GameObject();
-        g.name = "Ghost";
-        g.transform.parent = transform;
-        g.transform.localPosition = Vector3.zero + Vector3.back;
-        g.AddComponent<SpriteRenderer>();
-        g.AddComponent<BoxCollider2D>();
-        g.AddComponent<GuiGhost>();
-
-        // Box Collider Init
-        SpriteRenderer sr = g.GetComponent<SpriteRenderer>();
-        SpriteRenderer mSr = this.GetComponent<SpriteRenderer>();
-        sr.sprite = mSr.sprite;
-
-        // Box Collider Init
-        BoxCollider2D bc = g.GetComponent<BoxCollider2D>();
-        BoxCollider2D mBc = this.GetComponent<BoxCollider2D>();
-        bc.size = mBc.size;
-
-        return g.GetComponent<GuiGhost>();
+        // Reset Cmd Gui
+        mLrMoves.Reset(dir);
     }
 
     public void SelectMove()
@@ -184,7 +109,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonDown(1))
         {
             mState = State.None;
-            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+            mLrMoves.Retract();
             mCursorGhost.Show(false);
             return;
         }
@@ -224,7 +149,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if(curPath != null)
         {
             // Render
-            Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], curPath.RenderPoints());
+            mLrMoves.Stretch(curPath.RenderPoints());
 
             // Place Ghost
             mCursorGhost.Good();
@@ -233,7 +158,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
         else
         {
-            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+            mLrMoves.Retract();
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
@@ -242,7 +167,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         {
             curPath = null;
             mCursorGhost.Bad();
-            mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+            mLrMoves.Retract();
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
@@ -250,10 +175,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
             mPaths.Add(curPath);
-            MoveGuides(curPath.End, curPath.EndDir);
-            mMoveGhost.Show(true);
-            LineRenderer curMove = Draw.CreateLineRend(gameObject, "MovementLine", Color.red);
-            mLrMoves.Add(curMove);
+            mLrMoves.LockIn(mPaths.FinalDir);
         }
     }
 
@@ -265,7 +187,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     public bool Select()
     {
         mSel = true;
-        EnableGuides(true);
+        mLrMoves.EnableGuides(true);
         mySpriteRend.color = Color.yellow;
 
         return true;
@@ -279,7 +201,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         mSel = false;
         mySpriteRend.color = Color.blue;
-        EnableGuides(false);
+        mLrMoves.EnableGuides(false);
         return true;
     }
     /////////////////////////////////////////////////////////////////////
