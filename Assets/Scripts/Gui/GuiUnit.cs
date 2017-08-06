@@ -119,6 +119,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
         pnt.z = transform.position.z; // Set Z
         Ray2D dir = mSimCmd.FinalDir;
         Path curPath = null;
+        float timeLeft = mSimCmd.TimeLeft;
+        Debug.Log(timeLeft);
 
         // If in Back Arc, nothing
         mCursorGhost.Show(true);
@@ -138,12 +140,12 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Check if Within Line tolerance
         else if(Trig.DistToLine(dir, pnt) < .25f)
         {
-            curPath = new LinePath(dir, Trig.NearestPointOnLine(dir, pnt));
+            curPath = new LinePath(timeLeft, dir, Trig.NearestPointOnLine(dir, pnt));
         }
         // Else Arc
         else
         {
-            curPath = new ArcPath(dir, pnt);
+            curPath = new ArcPath(timeLeft, dir, pnt);
         }
 
         if(curPath != null)
@@ -162,20 +164,16 @@ public class GuiUnit : MonoBehaviour, ISelectable
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
-        // Check total time
-        if (curPath != null && mSimCmd.TimeSpent + curPath.Time > GameManager.TIME_PER_TURN)
-        {
-            curPath = null;
-            mCursorGhost.Bad();
-            mGuiCmd.Retract();
-            mCursorGhost.SetPos(pnt, Quaternion.identity);
-        }
-
         // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
             mSimCmd.Add(curPath);
             mGuiCmd.LockIn(mSimCmd.FinalDir);
+
+            if(mSimCmd.TimeLeft < float.Epsilon)
+            {
+                mGuiCmd.Fin();
+            }
         }
     }
 

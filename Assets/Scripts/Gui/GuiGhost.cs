@@ -49,6 +49,11 @@ public class GuiGhost : MonoBehaviour, IClickRef
         mySpriteRend.color = Color.green - new Color(0, 0, 0, .7f);
     }
 
+    public void Final()
+    {
+        mySpriteRend.color = Color.green;
+    }
+
     public void SetPos(Vector3 pos, Quaternion rot)
     {
         transform.position = pos;
