@@ -21,8 +21,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
     // Static Objects
     private GuiGhost mCursorGhost;
     private SimUnit mSim;
-    private SimCmd mPaths;
-    private GuiCmd mLrMoves;
+    private SimCmd mSimCmd;
+    private GuiCmd mGuiCmd;
 
     // Use this for initialization
     public void Start()
@@ -39,9 +39,9 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mCursorGhost = Draw.MakeGhost(gameObject);
         mCursorGhost.Show(false);
         mSim = new SimUnit();
-        mLrMoves = new GuiCmd(gameObject);
-        mLrMoves.SetLeft(SelectMove);
-        mPaths = new SimCmd();
+        mGuiCmd = new GuiCmd(gameObject);
+        mGuiCmd.SetLeft(SelectMove);
+        mSimCmd = new SimCmd();
 
         // Startup Functions
         ResetPath();
@@ -67,10 +67,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
     {
         Ray2D dir = new Ray2D(this.transform.position, this.transform.up);
         // Reset Cmd Sim
-        mPaths.Reset(dir);
+        mSimCmd.Reset(dir);
 
         // Reset Cmd Gui
-        mLrMoves.Reset(dir);
+        mGuiCmd.Reset(dir);
     }
 
     public void SelectMove()
@@ -109,7 +109,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if (Input.GetMouseButtonDown(1))
         {
             mState = State.None;
-            mLrMoves.Retract();
+            mGuiCmd.Retract();
             mCursorGhost.Show(false);
             return;
         }
@@ -117,7 +117,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Draw  Path
         Vector3 pnt = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         pnt.z = transform.position.z; // Set Z
-        Ray2D dir = mPaths.FinalDir;
+        Ray2D dir = mSimCmd.FinalDir;
         Path curPath = null;
 
         // If in Back Arc, nothing
@@ -149,7 +149,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if(curPath != null)
         {
             // Render
-            mLrMoves.Stretch(curPath.RenderPoints());
+            mGuiCmd.Stretch(curPath.RenderPoints());
 
             // Place Ghost
             mCursorGhost.Good();
@@ -158,24 +158,24 @@ public class GuiUnit : MonoBehaviour, ISelectable
         }
         else
         {
-            mLrMoves.Retract();
+            mGuiCmd.Retract();
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
         // Check total time
-        if (curPath != null && mPaths.TimeSpent + curPath.Time > GameManager.TIME_PER_TURN)
+        if (curPath != null && mSimCmd.TimeSpent + curPath.Time > GameManager.TIME_PER_TURN)
         {
             curPath = null;
             mCursorGhost.Bad();
-            mLrMoves.Retract();
+            mGuiCmd.Retract();
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
         // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
-            mPaths.Add(curPath);
-            mLrMoves.LockIn(mPaths.FinalDir);
+            mSimCmd.Add(curPath);
+            mGuiCmd.LockIn(mSimCmd.FinalDir);
         }
     }
 
@@ -187,7 +187,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
     public bool Select()
     {
         mSel = true;
-        mLrMoves.EnableGuides(true);
+        mGuiCmd.EnableGuides(true);
         mySpriteRend.color = Color.yellow;
 
         return true;
@@ -201,7 +201,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         mSel = false;
         mySpriteRend.color = Color.blue;
-        mLrMoves.EnableGuides(false);
+        mGuiCmd.EnableGuides(false);
         return true;
     }
     /////////////////////////////////////////////////////////////////////
