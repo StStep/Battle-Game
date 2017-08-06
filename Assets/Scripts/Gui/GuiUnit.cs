@@ -25,10 +25,10 @@ public class GuiUnit : MonoBehaviour, ISelectable
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
     private SimUnit mSim;
+    private SimCmd mPaths;
 
     // Dynamic Objects
     private List<LineRenderer> mLrMoves;
-    private List<Path> mPaths;
 
     // Use this for initialization
     public void Start()
@@ -54,7 +54,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         // Dyanimic Init
         mLrMoves = new List<LineRenderer>();
-        mPaths = new List<Path>();
+        mPaths = new SimCmd();
 
         // Startup Functions
         EnableGuides(false);
@@ -83,9 +83,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mMoveGhost.Show(false);
 
         // Make Paths
-        mPaths.Clear();
-        PointPath strPath = new PointPath(new Ray2D(this.transform.position, this.transform.up), this.transform.position);
-        mPaths.Add(strPath);
+        mPaths.Reset(new Ray2D(this.transform.position, this.transform.up));
 
         // Clear Existing objects
         foreach(LineRenderer lr in mLrMoves)
@@ -194,7 +192,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         // Draw  Path
         Vector3 pnt = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         pnt.z = transform.position.z; // Set Z
-        Ray2D dir = new Ray2D(mPaths[mPaths.Count - 1].End, mPaths[mPaths.Count - 1].EndDir);
+        Ray2D dir = mPaths.FinalDir;
         Path curPath = null;
 
         // If in Back Arc, nothing
@@ -239,12 +237,8 @@ public class GuiUnit : MonoBehaviour, ISelectable
             mCursorGhost.SetPos(pnt, Quaternion.identity);
         }
 
-        // Check total length, TODO Could be cached
-        float length = 0;
-        foreach (Path p in mPaths)
-            length += p.Length;
-
-        if (curPath != null && length + curPath.Length > mSim.Speed * GameManager.TIME_PER_TURN)
+        // Check total time
+        if (curPath != null && mPaths.TimeSpent + curPath.Time > GameManager.TIME_PER_TURN)
         {
             curPath = null;
             mCursorGhost.Bad();

@@ -2,15 +2,53 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimCmd : MonoBehaviour {
+public class SimCmd {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    // Dynamic Objects
+    List<ICommandSegment> mPaths;
+
+    float _timeSpent;
+    public float TimeSpent
+    {
+        get { return _timeSpent; }
+        protected set { _timeSpent = value; }
+    }
+
+    public float TimeLeft
+    {
+        get { return GameManager.TIME_PER_TURN - TimeSpent; }
+        protected set { }
+    }
+
+    public Ray2D FinalDir
+    {
+        get { return new Ray2D(Last().End, Last().EndDir); }
+        protected set { }
+    }
+
+    public SimCmd()
+    {
+        mPaths = new List<ICommandSegment>();
+        TimeSpent = 0;
+    }
+
+    public void Reset(Ray2D dir)
+    {
+        mPaths.Clear();
+        mPaths.Add(new PointPath(dir, Vector2.zero));
+        TimeSpent = 0;
+    }
+
+    public void Add(ICommandSegment seg)
+    {
+        mPaths.Add(seg);
+        TimeSpent += seg.Time;
+    }
+
+    public ICommandSegment Last()
+    {
+        return mPaths[mPaths.Count - 1];
+    }
+
+
 }

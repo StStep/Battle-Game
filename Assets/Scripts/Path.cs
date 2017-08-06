@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Path
+public abstract class Path : ICommandSegment
 {
     private Vector2 _end;
     public Vector2 End
@@ -39,6 +39,14 @@ public abstract class Path
     {
         get;
         protected set;
+    }
+
+    // TODO Assumes same speed across whole thing
+    public float Time
+    {
+        get { return Length / GameManager.DEFAULT_SPEED; }
+
+        protected set { }
     }
 
     public Path(Ray2D dir, Vector2 pnt)
