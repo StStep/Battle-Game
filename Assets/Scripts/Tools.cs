@@ -35,20 +35,31 @@ public static class Trig
         return dir.GetPoint(d);
     }
 
-    // TODO use frontage
-    public static bool WithinFrontQuarter(Ray2D dir, Vector2 pnt, float frontage)
+    public enum Half { front, back };
+    public static Half GetHalf(Vector2 origin, Vector2 direction, Vector2 pnt, float frontage, float sideage)
     {
-        bool ret = true;
+        return GetHalf(new Ray2D(origin, direction), pnt, frontage, sideage);
+    }
+    public static Half GetHalf(Ray2D dir, Vector2 pnt, float frontage, float sideage)
+    {
+        Half ret;
 
         Vector2 v = pnt - dir.origin;
-        float ang = Vector2.Angle(v, dir.direction);
-        if (ang > 45.5F)
-            ret = false;
+        float ang = Vector2.SignedAngle(v, dir.direction);
+        float absAng = Mathf.Abs(ang);
+        if (absAng <= 90f)
+            ret = Half.front;
+        else
+            ret = Half.back;
 
         return ret;
     }
 
     public enum Quarter {front, back, left, right};
+    public static Quarter GetQuarter(Vector2 origin, Vector2 direction, Vector2 pnt, float frontage, float sideage)
+    {
+        return GetQuarter(new Ray2D(origin, direction), pnt, frontage, sideage);
+    }
     public static Quarter GetQuarter(Ray2D dir, Vector2 pnt, float frontage, float sideage)
     {
         Quarter ret;
@@ -56,9 +67,9 @@ public static class Trig
         Vector2 v = pnt - dir.origin;
         float ang = Vector2.SignedAngle(v, dir.direction);
         float absAng = Mathf.Abs(ang);
-        if (absAng <= 45F)
+        if (absAng <= 45.5f)
             ret = Quarter.front;
-        else if(absAng >= 135F)
+        else if(absAng >= 135f)
             ret = Quarter.back;
         else if(ang < 0)
             ret = Quarter.left;
@@ -108,7 +119,7 @@ public static class Trig
     public static Arc GetArc(Ray2D dir, Vector2 pnt)
     {
         // Invalid if pnt is in back half of dir
-        if(!WithinFrontQuarter(dir, pnt, 0))
+        if(GetQuarter(dir, pnt, 0, 0) != Quarter.front)
             throw new System.Exception("Outside bounds");
 
         // LegA of isolese triangle is perp to dir

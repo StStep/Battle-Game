@@ -118,35 +118,21 @@ public class GuiUnit : MonoBehaviour, ISelectable
         Vector3 pnt = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         pnt.z = transform.position.z; // Set Z
         Ray2D dir = mSimCmd.FinalDir;
-        Path curPath = null;
         float timeLeft = mSimCmd.TimeLeft;
 
-        // If in Back Arc, nothing
         mCursorGhost.Show(true);
         mCursorGhost.Bad();
-        Trig.Quarter qrt = Trig.GetQuarter(dir, pnt, 0, 0);
-        // Min Move Distance
-        if (Vector3.Distance(dir.origin, pnt) < .05f)
+        Path curPath = null;
+
+        // Min Move Distance or Back Hald
+        if (Trig.GetHalf(dir, pnt, 0, 0) == Trig.Half.back
+            || Vector3.Distance(dir.origin, pnt) < GameManager.MOVE_MIN_PNT_DIST)
         { }
-        // Back Quarter
-        else if (qrt == Trig.Quarter.back)
-        { }
-        // If left, bend to edge
-        else if (qrt == Trig.Quarter.left)
+        // Line if within Line tolerance, or within min straight distance of start
+        else if(Trig.DistToLine(dir, pnt) < GameManager.MOVE_LINE_TOL
+            || Vector2.Distance(dir.origin, Trig.NearestPointOnLine(dir, pnt)) < GameManager.MOVE_MIN_ARC_DIST)
         {
-            Ray2D guide = new Ray2D(dir.origin, Quaternion.AngleAxis(45f, Vector3.forward) * dir.direction);
-            curPath = new ArcPath(timeLeft, dir, Trig.NearestPointOnLine(guide, pnt));
-        }
-        // If right, bend to edge
-        else if (qrt == Trig.Quarter.right)
-        {
-            Ray2D guide = new Ray2D(dir.origin, Quaternion.AngleAxis(-45f, Vector3.forward) * dir.direction);
-            curPath = new ArcPath(timeLeft, dir, Trig.NearestPointOnLine(guide, pnt));
-        }
-        // Check if Within Line tolerance
-        else if(Trig.DistToLine(dir, pnt) < .25f)
-        {
-            curPath = new LinePath(timeLeft, dir, Trig.NearestPointOnLine(dir, pnt));
+            curPath = new LinePath(timeLeft, dir, pnt);
         }
         // Else Arc
         else

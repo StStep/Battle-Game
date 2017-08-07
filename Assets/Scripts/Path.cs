@@ -54,7 +54,6 @@ public abstract class Path : ICommandSegment
         // Set Minimum input
         Start = dir.origin;
         StartDir = dir.direction;
-        End = pnt;
 
         // First Calculate
         Recalculate(time, pnt);
@@ -180,7 +179,7 @@ public class LinePath : Path
 
     protected override void Recalculate(float time, Vector2 pnt)
     {
-        End = pnt;
+        End = Trig.NearestPointOnLine(new Ray2D(Start, StartDir), pnt);
         mLength = Vector2.Distance(Start, End);
 
         // Recalc if too long
@@ -189,10 +188,6 @@ public class LinePath : Path
             End = GetPointTime(time);
             mLength = Vector2.Distance(Start, End);
         }
-
-        Vector2 tmpEnd = Start + mLength * StartDir;
-        if (tmpEnd != End)
-            throw new Exception(String.Format("Invalid line Calc {0} vs Actual {1}", End, tmpEnd));
     }
 }
 
@@ -288,11 +283,34 @@ public class ArcPath : Path
 
     protected override void Recalculate(float time, Vector2 pnt)
     {
-        Trig.Arc arc = Trig.GetArc(new Ray2D(Start, StartDir), pnt);
+        Ray2D dir = new Ray2D(Start, StartDir);
+        Trig.Quarter q = Trig.GetQuarter(dir, pnt, 0, 0);
+        if (q == Trig.Quarter.back)
+        {
+            throw new Exception("Invalid pnt for arc creation");
+        }
+        else if (q == Trig.Quarter.left)
+        {
+            Ray2D guide = new Ray2D(dir.origin, Quaternion.AngleAxis(45f, Vector3.forward) * dir.direction);
+            Ray2D toPnt = new Ray2D(pnt, Quaternion.AngleAxis(-90f, Vector3.forward) * dir.direction);
+            End = Trig.LineIntersectionPoint(guide, toPnt);
+        }
+        else if (q == Trig.Quarter.right)
+        {
+            Ray2D guide = new Ray2D(dir.origin, Quaternion.AngleAxis(-45f, Vector3.forward) * dir.direction);
+            Ray2D toPnt = new Ray2D(pnt, Quaternion.AngleAxis(90f, Vector3.forward) * dir.direction);
+            End = Trig.LineIntersectionPoint(guide, toPnt);
+        }
+        // Front
+        else
+        {
+            End = pnt;
+        }
+
+        Trig.Arc arc = Trig.GetArc(dir, End);
         mCenter = arc.Center;
         mRadius = Mathf.Abs(Vector2.Distance(Start, mCenter));
         mFinalDir = arc.FinalDir;
-        End = pnt;
 
         mRawAngle = Vector2.SignedAngle(Start - mCenter, End - mCenter);
         mArcLength = 2 * Mathf.PI * mRadius * (Mathf.Abs(mRawAngle) / 360f);
