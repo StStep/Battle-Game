@@ -143,7 +143,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         if(curPath != null)
         {
             // Render
-            mGuiCmd.Stretch(curPath.RenderPoints());
+            mGuiCmd.Stretch(curPath.RenderPoints(), pnt);
 
             // Place Ghost
             mCursorGhost.Good();

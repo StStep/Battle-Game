@@ -11,6 +11,7 @@ public class GuiCmd : IClickRef
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
+    private LineRenderer mGapLine;
 
     // Dynamic Objects
     private List<LineRenderer> mLrMoves;
@@ -23,6 +24,7 @@ public class GuiCmd : IClickRef
         mLrLGuide = Draw.CreateLineRend(obj, "LeftGuide", Color.yellow);
         mLrRGuide = Draw.CreateLineRend(obj, "RightGuide", Color.yellow);
         mLrCGuide = Draw.CreateLineRend(obj, "CenterGuide", Color.green);
+        mGapLine = Draw.CreateLineRend(obj, "GapLine", Color.blue);
 
         mMoveGhost = Draw.MakeGhost(obj);
         mMoveGhost.Show(false);
@@ -59,11 +61,18 @@ public class GuiCmd : IClickRef
     public void Retract()
     {
         mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+        mGapLine.positionCount = 0;
     }
 
-    public void Stretch(Vector3[] pnts)
+    public void Stretch(Vector3[] pnts, Vector3 mouse)
     {
         Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], pnts);
+
+        Vector3[] gap = new Vector3[2];
+        gap[0] = pnts[pnts.Length - 1];
+        gap[1] = mouse;
+        Draw.DrawLineRend(mGapLine, gap);
+
     }
 
     public void EnableGuides(bool en)
