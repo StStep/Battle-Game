@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     // Constants
     public const float TIME_PER_TURN = 20f;
     public const float DEFAULT_SPEED = 4f / TIME_PER_TURN;
-    public const float DEFAULTMIN_TURN_RAD = 3f;
+    public const float DEFAULT_MIN_TURN_RAD = 3f;
 
     public const float MOVE_LINE_TOL = 0.25f;
     public const float MOVE_MIN_PNT_DIST = 0.1f;

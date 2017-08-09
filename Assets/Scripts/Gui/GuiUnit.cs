@@ -124,7 +124,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mCursorGhost.Bad();
         Path curPath = null;
 
-        // Min Move Distance or Back Hald
+        // Min Move Distance or Back Half
         if (Trig.GetHalf(dir, pnt, 0, 0) == Trig.Half.back
             || Vector3.Distance(dir.origin, pnt) < GameManager.MOVE_MIN_PNT_DIST)
         { }
