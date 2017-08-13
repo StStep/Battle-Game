@@ -13,6 +13,12 @@ public abstract class ClickObject : MonoBehaviour, IClickable, ISelectable
     protected Selector mSelector = null;
     protected GameObject mPar = null;
 
+    public GuiRender Renderer
+    {
+        get { return mGuiRender; }
+        protected set { }
+    }
+
     public virtual void Init(GameObject par, Selector sel, GuiRender ren)
     {
         mPar = par;
@@ -47,23 +53,20 @@ public abstract class ClickObject : MonoBehaviour, IClickable, ISelectable
         gameObject.SetActive(en);
     }
 
-    public void Render()
-    {
-        mGuiRender.Render();
-    }
-
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
     public virtual bool Select()
     {
         mSel = true;
+        mGuiRender.SelectedRender(true);
         return true;
     }
 
     public virtual bool Deselect()
     {
         mSel = false;
+        mGuiRender.SelectedRender(false);
         return true;
     }
     /////////////////////////////////////////////////////////////////////

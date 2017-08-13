@@ -15,36 +15,21 @@ public class GhostRender : GuiRender
         mySpriteRend = mGo.AddComponent<SpriteRenderer>();
         mySpriteRend.sprite = sp;
 
-        Neutral();
+        NeutralRender();
     }
 
-    public override void Render()
+    public override void SelectedRender(bool en)
     {
-        throw new NotImplementedException();
+        ;
     }
 
-    public override void Neutral()
-    {
-        mySpriteRend.color = Color.white;
-    }
-
-    public override void Bad()
-    {
-        mySpriteRend.color = Color.red - new Color(0, 0, 0, .7f);
-    }
-
-    public override void Good()
-    {
-        mySpriteRend.color = Color.green - new Color(0, 0, 0, .7f);
-    }
-
-    public override void Final()
+    public override void LockRender()
     {
         mySpriteRend.color = Color.green;
     }
 
-    public override void Show(bool en)
+    public override void NeutralRender()
     {
-        mySpriteRend.enabled = en;
+        mySpriteRend.color = Color.white;
     }
 }

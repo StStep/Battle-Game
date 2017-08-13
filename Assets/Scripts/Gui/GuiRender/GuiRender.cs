@@ -10,15 +10,9 @@ public abstract class GuiRender
         mGo = go;
     }
 
-    public abstract void Render();
+    public abstract void SelectedRender(bool en);
 
-    public abstract void Neutral();
+    public abstract void NeutralRender();
 
-    public abstract void Bad();
-
-    public abstract void Good();
-
-    public abstract void Final();
-
-    public abstract void Show(bool en);
+    public abstract void LockRender();
 }

@@ -27,6 +27,7 @@ public class GuiCmd
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
         mMoveGhost = Draw.MakeCmdSegTip(par, sel);
+        mMoveGhost.Renderer.NeutralRender();
     }
 
     public void Reset(Ray2D dir)
@@ -40,6 +41,7 @@ public class GuiCmd
         LockIn(dir);
 
         mMoveGhost.Show(false);
+        mMoveGhost.Renderer.NeutralRender();
     }
 
     public void LockIn(Ray2D dir)
@@ -53,7 +55,7 @@ public class GuiCmd
 
     public void Fin()
     {
-        //mMoveGhost.Final();
+        mMoveGhost.Renderer.LockRender();
     }
 
     public void Retract()
