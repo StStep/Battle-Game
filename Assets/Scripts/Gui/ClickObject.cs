@@ -67,14 +67,14 @@ public class ClickObject : MonoBehaviour, IClickable, ISelectable
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
-    public bool Select()
+    public bool SelectSelf()
     {
         mSel = true;
         mGuiRender.SelectedRender(true);
         return true;
     }
 
-    public bool Deselect()
+    public bool DeselectSelf()
     {
         mSel = false;
         mGuiRender.SelectedRender(false);

@@ -41,7 +41,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
 
         // Startup Functions
         ResetPath();
-        Deselect();
+        DeselectSelf();
     }
 
     // Update is called once per frame
@@ -194,7 +194,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
-    public bool Select()
+    public bool SelectSelf()
     {
         mSel = true;
         mGuiCmd.EnableGuides(true);
@@ -203,7 +203,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
         return true;
     }
 
-    public bool Deselect()
+    public bool DeselectSelf()
     {
         // Only deslect if doing nothing
         if (mState != State.None)

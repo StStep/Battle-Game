@@ -2,9 +2,9 @@
 
 public interface ISelectable
 {
-    bool Select();
+    bool SelectSelf();
 
-    bool Deselect();
+    bool DeselectSelf();
 }
 
 /// <summary>
@@ -49,7 +49,7 @@ public class Selector
     public bool ChainDeselect()
     {
         // Deslect self
-        if ((mItem != null) && !mItem.Deselect())
+        if ((mItem != null) && !mItem.DeselectSelf())
             return false;
 
         //Deselect Children
@@ -114,6 +114,6 @@ public class Selector
         if (mItem == null)
             return true;
 
-        return mItem.Select();
+        return mItem.SelectSelf();
     }
 }
