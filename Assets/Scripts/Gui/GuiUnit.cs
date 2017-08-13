@@ -5,11 +5,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
-public class GuiUnit : MonoBehaviour, ISelectable
+public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
 {
-    // Types
-    enum State {None, Moving};
-
     // Status Member
     private bool mSel;
     private State mState;
@@ -73,6 +70,30 @@ public class GuiUnit : MonoBehaviour, ISelectable
         mGuiCmd.Reset(dir);
     }
 
+    public bool SetState(State st)
+    {
+        if (mState != State.None && st != State.None)
+            return false;
+
+        bool ret = false;
+        switch (st)
+        {
+            case State.Moving:
+                if (mSimCmd.TimeLeft > float.Epsilon)
+                {
+                    mState = State.Moving;
+                    ret = true;
+                }
+                break;
+            default:
+                mState = State.None;
+                ret = true;
+                break;
+        }
+
+        return ret;
+    }
+
     public void SelectMove()
     {
         if (!mSel)
@@ -82,10 +103,7 @@ public class GuiUnit : MonoBehaviour, ISelectable
 
         if (mSel)
         {
-            if (mState == State.None && mSimCmd.TimeLeft > float.Epsilon)
-            {
-                mState = State.Moving; // Defualt to moving after selecting
-            }
+            SetState(State.Moving);
         }
     }
 
