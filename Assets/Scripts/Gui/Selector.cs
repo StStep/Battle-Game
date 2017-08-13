@@ -1,6 +1,6 @@
 ﻿using System;
 
-public interface ISelectable
+public interface ISelectorItem
 {
     bool SelectSelf();
 
@@ -14,13 +14,13 @@ public class Selector
 {
     private String mName;
     private Selector mPar;
-    private ISelectable mItem;
+    private ISelectorItem mItem;
     private Selector mChild;
 
     public Selector(String name) : this(name, null, null)
     { }
 
-    public Selector(String name, Selector parent, ISelectable item)
+    public Selector(String name, Selector parent, ISelectorItem item)
     {
         mName = name;
         mChild = null;

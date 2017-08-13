@@ -187,31 +187,8 @@ public static class Draw
         lr.SetPositions(pnts);
     }
 
-    public static GuiGhost MakeGhost(GameObject par)
-    {
-        GameObject g = new GameObject();
-        g.name = "Ghost";
-        g.transform.parent = par.transform;
-        g.transform.localPosition = Vector3.zero + Vector3.back;
-        g.AddComponent<SpriteRenderer>();
-        g.AddComponent<BoxCollider2D>();
-        g.AddComponent<GuiGhost>();
-
-        // Sprite Render Init
-        SpriteRenderer sr = g.GetComponent<SpriteRenderer>();
-        SpriteRenderer mSr = par.GetComponent<SpriteRenderer>();
-        sr.sprite = mSr.sprite;
-
-        // Box Collider Init
-        BoxCollider2D bc = g.GetComponent<BoxCollider2D>();
-        BoxCollider2D mBc = par.GetComponent<BoxCollider2D>();
-        bc.size = mBc.size;
-
-        return g.GetComponent<GuiGhost>();
-    }
-
-    // TODO TEMP
-    public static ClickObject MakeCmdSegTip(GameObject par, Selector sel)
+    // TODO Factory??
+    public static ClickObject MakeGhost(GameObject par, Selector sel)
     {
         GameObject g = new GameObject();
         g.name = "CmdSegTip";

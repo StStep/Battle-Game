@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public delegate void ClickDel();
 
 [RequireComponent(typeof(Collider2D))]
-public class ClickObject : MonoBehaviour, ISelectable
+public class ClickObject : MonoBehaviour, ISelectorItem
 {
     // Status Members
     private bool mSel = false;
@@ -37,22 +37,6 @@ public class ClickObject : MonoBehaviour, ISelectable
         mGuiRender = ren;
     }
 
-    // Use this for initialization
-    public void Awake()
-    {
-        ;
-    }
-
-    public void Start()
-    {
-        ;
-    }
-
-    public void Update()
-    {
-        ;
-    }
-
     public void SetPos(Vector3 pos, Quaternion rot)
     {
         transform.position = pos;
@@ -69,8 +53,8 @@ public class ClickObject : MonoBehaviour, ISelectable
         return mSelector.ChainSelect();
     }
 
-    #region ISelectable
-    //////////////////////// ISelectable ///////////////////////////////
+    #region ISelectorItem
+    //////////////////////// ISelectorItem ///////////////////////////////
 
     public bool SelectSelf()
     {

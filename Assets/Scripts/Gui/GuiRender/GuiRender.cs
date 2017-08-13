@@ -15,4 +15,8 @@ public abstract class GuiRender
     public abstract void NeutralRender();
 
     public abstract void LockRender();
+
+    public abstract void BadRender();
+
+    public abstract void GoodRender();
 }

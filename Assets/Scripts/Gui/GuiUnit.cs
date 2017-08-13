@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
-public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
+public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
 {
     // Status Member
     private bool mSel;
@@ -13,7 +13,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
     private Selector mSelector;
 
     // Static Objects
-    private GuiGhost mCursorGhost;
+    private ClickObject mCursorGhost;
     private SimUnit mSim;
     private SimCmd mSimCmd;
     private GuiCmd mGuiCmd;
@@ -27,7 +27,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
         mSel = false;
 
         // Static Init
-        mCursorGhost = Draw.MakeGhost(gameObject);
+        mCursorGhost = Draw.MakeGhost(gameObject, mSelector);
         mCursorGhost.Show(false);
         mSim = new SimUnit();
         mGuiCmd = new GuiCmd(gameObject, mSelector);
@@ -109,7 +109,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
         float timeLeft = mSimCmd.TimeLeft;
 
         mCursorGhost.Show(true);
-        mCursorGhost.Bad();
+        mCursorGhost.Renderer.BadRender();
         Path curPath = null;
 
         // Min Move Distance or Back Half
@@ -134,7 +134,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
             mGuiCmd.Stretch(curPath.RenderPoints(), pnt);
 
             // Place Ghost
-            mCursorGhost.Good();
+            mCursorGhost.Renderer.GoodRender();
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
             mCursorGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
@@ -162,8 +162,8 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
 
     #endregion
 
-    #region ISelectable
-    //////////////////////// ISelectable ///////////////////////////////
+    #region ISelectorItem
+    //////////////////////// ISelectorItem ///////////////////////////////
 
     public bool SelectSelf()
     {

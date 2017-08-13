@@ -35,4 +35,14 @@ public class GhostRender : GuiRender
     {
         mySpriteRend.color = Color.white;
     }
+
+    public override void BadRender()
+    {
+        mySpriteRend.color = Color.red - new Color(0, 0, 0, .7f);
+    }
+
+    public override void GoodRender()
+    {
+        mySpriteRend.color = Color.green - new Color(0, 0, 0, .7f);
+    }
 }

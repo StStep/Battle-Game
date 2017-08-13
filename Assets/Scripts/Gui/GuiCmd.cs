@@ -29,11 +29,11 @@ public class GuiCmd
         mLrCGuide = Draw.CreateLineRend(par, "CenterGuide", Color.green);
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
-        mEndGhost = Draw.MakeCmdSegTip(par, sel);
+        mEndGhost = Draw.MakeGhost(par, sel);
         mEndGhost.Renderer.NeutralRender();
         mEndGhost.LeftClick = () => ClickStart(false);
 
-        mStartGhost = Draw.MakeCmdSegTip(par, sel);
+        mStartGhost = Draw.MakeGhost(par, sel);
         mStartGhost.Renderer.SelectedRender(false);
         mStartGhost.LeftClick = () => ClickStart(true);
     }
