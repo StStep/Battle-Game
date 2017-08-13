@@ -197,7 +197,7 @@ public static class Draw
         g.AddComponent<BoxCollider2D>();
         g.AddComponent<GuiGhost>();
 
-        // Box Collider Init
+        // Sprite Render Init
         SpriteRenderer sr = g.GetComponent<SpriteRenderer>();
         SpriteRenderer mSr = par.GetComponent<SpriteRenderer>();
         sr.sprite = mSr.sprite;
@@ -208,6 +208,30 @@ public static class Draw
         bc.size = mBc.size;
 
         return g.GetComponent<GuiGhost>();
+    }
+
+    // TODO TEMP
+    public static GuiTipObject MakeCmdSegTip(GameObject par, Selector sel)
+    {
+        GameObject g = new GameObject();
+        g.name = "CmdSegTip";
+        g.transform.parent = par.transform;
+        g.transform.localPosition = Vector3.zero + Vector3.back;
+        g.AddComponent<BoxCollider2D>();
+
+        // Sprite Render Init
+        SpriteRenderer mSr = par.GetComponent<SpriteRenderer>();
+
+        // Gui Tip Object
+        GuiTipObject tip = g.AddComponent<GuiTipObject>();
+        tip.Init(par, sel, new GhostRender(g, mSr.sprite), par.GetComponent<GuiUnit>());
+
+        // Box Collider Init
+        BoxCollider2D bc = g.GetComponent<BoxCollider2D>();
+        BoxCollider2D mBc = par.GetComponent<BoxCollider2D>();
+        bc.size = mBc.size;
+
+        return tip;
     }
 
 }

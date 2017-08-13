@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GuiCmd : IClickRef
+public class GuiCmd
 {
     // Static Objects
     private GameObject mParent;
-    private GuiGhost mMoveGhost;
+    private GuiTipObject mMoveGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
@@ -16,18 +16,17 @@ public class GuiCmd : IClickRef
     // Dynamic Objects
     private List<LineRenderer> mLrMoves;
 
-    public GuiCmd(GameObject obj)
+    public GuiCmd(GameObject par, Selector sel)
     {
         mLrMoves = new List<LineRenderer>();
-        mParent = obj;
+        mParent = par;
 
-        mLrLGuide = Draw.CreateLineRend(obj, "LeftGuide", Color.yellow);
-        mLrRGuide = Draw.CreateLineRend(obj, "RightGuide", Color.yellow);
-        mLrCGuide = Draw.CreateLineRend(obj, "CenterGuide", Color.green);
-        mGapLine = Draw.CreateLineRend(obj, "GapLine", Color.blue);
+        mLrLGuide = Draw.CreateLineRend(par, "LeftGuide", Color.yellow);
+        mLrRGuide = Draw.CreateLineRend(par, "RightGuide", Color.yellow);
+        mLrCGuide = Draw.CreateLineRend(par, "CenterGuide", Color.green);
+        mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
-        mMoveGhost = Draw.MakeGhost(obj);
-        mMoveGhost.Show(false);
+        mMoveGhost = Draw.MakeCmdSegTip(par, sel);
     }
 
     public void Reset(Ray2D dir)
@@ -40,7 +39,6 @@ public class GuiCmd : IClickRef
 
         LockIn(dir);
 
-        mMoveGhost.Neutral();
         mMoveGhost.Show(false);
     }
 
@@ -55,7 +53,7 @@ public class GuiCmd : IClickRef
 
     public void Fin()
     {
-        mMoveGhost.Final();
+        //mMoveGhost.Final();
     }
 
     public void Retract()
@@ -102,18 +100,4 @@ public class GuiCmd : IClickRef
         float ghRot = Vector2.SignedAngle(Vector2.up, dir.direction);
         mMoveGhost.SetPos(dir.origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
     }
-
-    #region IClickRef
-    //////////////////////// IClickRef ///////////////////////////////
-
-    public void SetLeft(Click del)
-    {
-        mMoveGhost.SetLeft(del);
-    }
-
-    public void SetRight(Click del)
-    { }
-
-    /////////////////////////////////////////////////////////////////
-    #endregion
 }

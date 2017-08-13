@@ -36,8 +36,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
         mCursorGhost = Draw.MakeGhost(gameObject);
         mCursorGhost.Show(false);
         mSim = new SimUnit();
-        mGuiCmd = new GuiCmd(gameObject);
-        mGuiCmd.SetLeft(SelectMove);
+        mGuiCmd = new GuiCmd(gameObject, mSelector);
         mSimCmd = new SimCmd();
 
         // Startup Functions
