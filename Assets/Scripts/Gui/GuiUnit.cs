@@ -12,9 +12,6 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
     private State mState;
     private Selector mSelector;
 
-    // Components
-    private SpriteRenderer mySpriteRend;
-
     // Static Objects
     private GuiGhost mCursorGhost;
     private SimUnit mSim;
@@ -24,9 +21,6 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
     // Use this for initialization
     public void Start()
     {
-        // Components
-        mySpriteRend = GetComponent<SpriteRenderer>();
-
         // Status Members
         mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
         mState = State.None;
@@ -59,7 +53,7 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
 
     #region Utility
 
-    private void ResetPath()
+    public void ResetPath()
     {
         Ray2D dir = new Ray2D(this.transform.position, this.transform.up);
         // Reset Cmd Sim
@@ -91,29 +85,6 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
         }
 
         return ret;
-    }
-
-    public void SelectMove()
-    {
-        if (!mSel)
-        {
-            mSelector.ChainSelect();
-        }
-
-        if (mSel)
-        {
-            SetState(State.Moving);
-        }
-    }
-
-    public void SelectRotate()
-    {
-        if (!mSel)
-        {
-            mSelector.ChainSelect();
-        }
-
-        // TODO Rotate
     }
 
     #endregion
@@ -198,7 +169,6 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
     {
         mSel = true;
         mGuiCmd.EnableGuides(true);
-        mySpriteRend.color = Color.yellow;
 
         return true;
     }
@@ -210,44 +180,9 @@ public class GuiUnit : MonoBehaviour, ISelectable, ICommandRef
             return false;
 
         mSel = false;
-        mySpriteRend.color = Color.blue;
         mGuiCmd.EnableGuides(false);
         return true;
     }
-    /////////////////////////////////////////////////////////////////////
-    #endregion
-
-    #region MouseIF
-    //////////////////////// MouseIF ///////////////////////////////
-
-    public void OnMouseOver()
-    {
-        // Ignore UI click
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
-
-        // Left Click
-        if (Input.GetMouseButtonUp(0))
-        {
-            ResetPath();
-            SelectMove();
-        }
- 
-        // Right Click
-        if (Input.GetMouseButtonUp(1))
-        {
-            SelectRotate();
-        }
-
-        // Middle Click
-        if (Input.GetMouseButtonUp(2))
-        {
-            Debug.Log("Pressed middle click.");
-        }
-    }
-
     /////////////////////////////////////////////////////////////////////
     #endregion
 }

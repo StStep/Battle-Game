@@ -20,7 +20,10 @@ public class GhostRender : GuiRender
 
     public override void SelectedRender(bool en)
     {
-        ;
+        if(en)
+            mySpriteRend.color = Color.yellow;
+        else
+            mySpriteRend.color = Color.blue;
     }
 
     public override void LockRender()

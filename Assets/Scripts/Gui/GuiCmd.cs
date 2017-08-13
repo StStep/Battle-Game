@@ -7,6 +7,7 @@ public class GuiCmd
 {
     // Static Objects
     private GameObject mParent;
+    private ClickObject mStartGhost;
     private ClickObject mEndGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
@@ -30,16 +31,23 @@ public class GuiCmd
 
         mEndGhost = Draw.MakeCmdSegTip(par, sel);
         mEndGhost.Renderer.NeutralRender();
-        mEndGhost.SetDel(ClickStart);
+        mEndGhost.SetDel((t) => ClickStart(false, t));
+
+        mStartGhost = Draw.MakeCmdSegTip(par, sel);
+        mStartGhost.Renderer.SelectedRender(false);
+        mStartGhost.SetDel((t) => ClickStart(true, t));
     }
 
-    public void ClickStart(ClickType t)
+    public void ClickStart(bool reset, ClickType t)
     {
         switch (t)
         {
             case ClickType.LeftClick:
-                if (mEndGhost.ChainSelect())
-                    cmdRef.SetState(State.Moving);
+                if (!mStartGhost.ChainSelect())
+                    return;
+                if (reset)
+                    cmdRef.ResetPath();
+                cmdRef.SetState(State.Moving);
                 break;
             default:
                 break;

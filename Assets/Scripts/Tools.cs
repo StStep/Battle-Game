@@ -217,6 +217,7 @@ public static class Draw
         g.name = "CmdSegTip";
         g.transform.parent = par.transform;
         g.transform.localPosition = Vector3.zero + Vector3.back;
+        g.transform.localRotation = Quaternion.identity;
         g.AddComponent<BoxCollider2D>();
 
         // Sprite Render Init
