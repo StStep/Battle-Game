@@ -70,10 +70,9 @@ public class Selector
     /// <returns>True if successfully selected.</returns>
     private bool SelectChild(Selector obj)
     {
-        if(mPar != null)
+        if(!ChainSelect())
         {
-            if (!mPar.ChainSelect())
-                return false;
+            return false;
         }
 
         bool ret = true;
