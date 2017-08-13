@@ -211,7 +211,7 @@ public static class Draw
     }
 
     // TODO TEMP
-    public static GuiTipObject MakeCmdSegTip(GameObject par, Selector sel)
+    public static ClickObject MakeCmdSegTip(GameObject par, Selector sel)
     {
         GameObject g = new GameObject();
         g.name = "CmdSegTip";
@@ -223,8 +223,8 @@ public static class Draw
         SpriteRenderer mSr = par.GetComponent<SpriteRenderer>();
 
         // Gui Tip Object
-        GuiTipObject tip = g.AddComponent<GuiTipObject>();
-        tip.Init(par, sel, new GhostRender(g, mSr.sprite), par.GetComponent<GuiUnit>());
+        ClickObject tip = g.AddComponent<ClickObject>();
+        tip.Init(par, sel, new GhostRender(g, mSr.sprite));
 
         // Box Collider Init
         BoxCollider2D bc = g.GetComponent<BoxCollider2D>();

@@ -5,13 +5,14 @@ using UnityEngine.EventSystems;
 
 
 [RequireComponent(typeof(Collider2D))]
-public abstract class ClickObject : MonoBehaviour, IClickable, ISelectable
+public class ClickObject : MonoBehaviour, IClickable, ISelectable
 {
     // Status Members
     protected bool mSel = false;
     protected GuiRender mGuiRender = null;
     protected Selector mSelector = null;
     protected GameObject mPar = null;
+    protected ClickDel mClickDel = null;
 
     public GuiRender Renderer
     {
@@ -24,6 +25,11 @@ public abstract class ClickObject : MonoBehaviour, IClickable, ISelectable
         mPar = par;
         mSelector = new Selector(gameObject.name, sel, this);
         mGuiRender = ren;
+    }
+
+    public void SetDel(ClickDel del)
+    {
+        mClickDel = del;
     }
 
     // Use this for initialization
@@ -53,6 +59,11 @@ public abstract class ClickObject : MonoBehaviour, IClickable, ISelectable
         gameObject.SetActive(en);
     }
 
+    public bool ChainSelect()
+    {
+        return mSelector.ChainSelect();
+    }
+
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
@@ -75,7 +86,11 @@ public abstract class ClickObject : MonoBehaviour, IClickable, ISelectable
     #region IClickable
     //////////////////////// IClickable ///////////////////////////////
 
-    public virtual void Click(ClickType t) { }
+    public void Click(ClickType t)
+    {
+        if(mClickDel != null)
+            mClickDel(t);
+    }
 
     /////////////////////////////////////////////////////////////////////
     #endregion

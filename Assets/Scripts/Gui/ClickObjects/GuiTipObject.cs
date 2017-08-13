@@ -42,25 +42,4 @@ public class GuiTipObject : GuiSegObject
     }
 
     #endregion
-
-    #region IClickable
-    //////////////////////// IClickable ///////////////////////////////
-
-    public override void Click(ClickType t)
-    {
-        switch(t)
-        {
-            case ClickType.LeftClick:
-                Move();
-                break;
-            case ClickType.RightClick:
-                Rotate();
-                break;
-            default:
-                break;
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    #endregion
 }

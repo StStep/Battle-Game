@@ -7,11 +7,12 @@ public class GuiCmd
 {
     // Static Objects
     private GameObject mParent;
-    private GuiTipObject mMoveGhost;
+    private ClickObject mMoveGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
     private LineRenderer mGapLine;
+    protected ICommandRef cmdRef;
 
     // Dynamic Objects
     private List<LineRenderer> mLrMoves;
@@ -20,6 +21,7 @@ public class GuiCmd
     {
         mLrMoves = new List<LineRenderer>();
         mParent = par;
+        cmdRef = par.GetComponent<GuiUnit>();
 
         mLrLGuide = Draw.CreateLineRend(par, "LeftGuide", Color.yellow);
         mLrRGuide = Draw.CreateLineRend(par, "RightGuide", Color.yellow);
@@ -28,6 +30,20 @@ public class GuiCmd
 
         mMoveGhost = Draw.MakeCmdSegTip(par, sel);
         mMoveGhost.Renderer.NeutralRender();
+        mMoveGhost.SetDel(ClickStart);
+    }
+
+    public void ClickStart(ClickType t)
+    {
+        switch (t)
+        {
+            case ClickType.LeftClick:
+                if (mMoveGhost.ChainSelect())
+                    cmdRef.SetState(State.Moving);
+                break;
+            default:
+                break;
+        }
     }
 
     public void Reset(Ray2D dir)
