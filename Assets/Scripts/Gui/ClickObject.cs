@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+public delegate void ClickDel();
 
 [RequireComponent(typeof(Collider2D))]
-public class ClickObject : MonoBehaviour, IClickable, ISelectable
+public class ClickObject : MonoBehaviour, ISelectable
 {
     // Status Members
-    protected bool mSel = false;
-    protected GuiRender mGuiRender = null;
-    protected Selector mSelector = null;
-    protected GameObject mPar = null;
-    protected ClickDel mClickDel = null;
+    private bool mSel = false;
+    private GuiRender mGuiRender = null;
+    private Selector mSelector = null;
+    private GameObject mPar = null;
+
+    public ClickDel RightClick = null;
+    public ClickDel LeftClick = null;
+    public ClickDel MiddleClick = null;
+    public ClickDel DoubleRightClick = null;
+    public ClickDel DoubleLeftClick = null;
+    public ClickDel DoubleMiddleClick = null;
+    public ClickDel HoldRightClick = null;
+    public ClickDel HoldLeftClick = null;
+    public ClickDel HoldMiddleClick = null;
 
     public GuiRender Renderer
     {
@@ -25,11 +35,6 @@ public class ClickObject : MonoBehaviour, IClickable, ISelectable
         mPar = par;
         mSelector = new Selector(gameObject.name, sel, this);
         mGuiRender = ren;
-    }
-
-    public void SetDel(ClickDel del)
-    {
-        mClickDel = del;
     }
 
     // Use this for initialization
@@ -83,18 +88,6 @@ public class ClickObject : MonoBehaviour, IClickable, ISelectable
     /////////////////////////////////////////////////////////////////////
     #endregion
 
-    #region IClickable
-    //////////////////////// IClickable ///////////////////////////////
-
-    public void Click(ClickType t)
-    {
-        if(mClickDel != null)
-            mClickDel(t);
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    #endregion
-
     #region MouseIF
     //////////////////////// MouseIF ///////////////////////////////
 
@@ -107,19 +100,19 @@ public class ClickObject : MonoBehaviour, IClickable, ISelectable
         // Left Click
         if (Input.GetMouseButtonUp(0))
         {
-            Click(ClickType.LeftClick);
+            if (LeftClick != null) LeftClick();
         }
 
         // Right Click
         if (Input.GetMouseButtonUp(1))
         {
-            Click(ClickType.RightClick);
+            if (RightClick != null) RightClick();
         }
 
         // Middle Click
         if (Input.GetMouseButtonUp(2))
         {
-            Click(ClickType.MiddleClick);
+            if (MiddleClick != null) MiddleClick();
         }
     }
 

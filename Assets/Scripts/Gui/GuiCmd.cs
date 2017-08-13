@@ -31,27 +31,22 @@ public class GuiCmd
 
         mEndGhost = Draw.MakeCmdSegTip(par, sel);
         mEndGhost.Renderer.NeutralRender();
-        mEndGhost.SetDel((t) => ClickStart(false, t));
+        mEndGhost.LeftClick = () => ClickStart(false);
 
         mStartGhost = Draw.MakeCmdSegTip(par, sel);
         mStartGhost.Renderer.SelectedRender(false);
-        mStartGhost.SetDel((t) => ClickStart(true, t));
+        mStartGhost.LeftClick = () => ClickStart(true);
     }
 
-    public void ClickStart(bool reset, ClickType t)
+    public void ClickStart(bool reset)
     {
-        switch (t)
-        {
-            case ClickType.LeftClick:
-                if (!mStartGhost.ChainSelect())
-                    return;
-                if (reset)
-                    cmdRef.ResetPath();
-                cmdRef.SetState(State.Moving);
-                break;
-            default:
-                break;
-        }
+        if (!mStartGhost.ChainSelect())
+            return;
+
+        if (reset)
+            cmdRef.ResetPath();
+
+        cmdRef.SetState(State.Moving);
     }
 
     public void Reset(Ray2D dir)
