@@ -20,7 +20,7 @@ public class ClickObject : MonoBehaviour, IClickable, ISelectable
         protected set { }
     }
 
-    public virtual void Init(GameObject par, Selector sel, GuiRender ren)
+    public void Init(GameObject par, Selector sel, GuiRender ren)
     {
         mPar = par;
         mSelector = new Selector(gameObject.name, sel, this);
@@ -67,14 +67,14 @@ public class ClickObject : MonoBehaviour, IClickable, ISelectable
     #region ISelectable
     //////////////////////// ISelectable ///////////////////////////////
 
-    public virtual bool Select()
+    public bool Select()
     {
         mSel = true;
         mGuiRender.SelectedRender(true);
         return true;
     }
 
-    public virtual bool Deselect()
+    public bool Deselect()
     {
         mSel = false;
         mGuiRender.SelectedRender(false);

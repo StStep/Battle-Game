@@ -7,7 +7,7 @@ public class GuiCmd
 {
     // Static Objects
     private GameObject mParent;
-    private ClickObject mMoveGhost;
+    private ClickObject mEndGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
@@ -28,9 +28,9 @@ public class GuiCmd
         mLrCGuide = Draw.CreateLineRend(par, "CenterGuide", Color.green);
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
-        mMoveGhost = Draw.MakeCmdSegTip(par, sel);
-        mMoveGhost.Renderer.NeutralRender();
-        mMoveGhost.SetDel(ClickStart);
+        mEndGhost = Draw.MakeCmdSegTip(par, sel);
+        mEndGhost.Renderer.NeutralRender();
+        mEndGhost.SetDel(ClickStart);
     }
 
     public void ClickStart(ClickType t)
@@ -38,7 +38,7 @@ public class GuiCmd
         switch (t)
         {
             case ClickType.LeftClick:
-                if (mMoveGhost.ChainSelect())
+                if (mEndGhost.ChainSelect())
                     cmdRef.SetState(State.Moving);
                 break;
             default:
@@ -56,8 +56,8 @@ public class GuiCmd
 
         LockIn(dir);
 
-        mMoveGhost.Show(false);
-        mMoveGhost.Renderer.NeutralRender();
+        mEndGhost.Show(false);
+        mEndGhost.Renderer.NeutralRender();
     }
 
     public void LockIn(Ray2D dir)
@@ -66,12 +66,12 @@ public class GuiCmd
         mLrMoves.Add(curMove);
 
         MoveGuides(dir);
-        mMoveGhost.Show(true);
+        mEndGhost.Show(true);
     }
 
     public void Fin()
     {
-        mMoveGhost.Renderer.LockRender();
+        mEndGhost.Renderer.LockRender();
     }
 
     public void Retract()
@@ -116,6 +116,6 @@ public class GuiCmd
         Draw.DrawLineRend(mLrLGuide, line);
 
         float ghRot = Vector2.SignedAngle(Vector2.up, dir.direction);
-        mMoveGhost.SetPos(dir.origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
+        mEndGhost.SetPos(dir.origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
     }
 }
