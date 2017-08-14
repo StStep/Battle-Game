@@ -7,7 +7,6 @@ public class RenderComponent : MonoBehaviour
 {
     // Status Members
     private GuiRender mGuiRender = null;
-    private GameObject mPar = null;
 
     public GuiRender Renderer
     {
@@ -15,9 +14,8 @@ public class RenderComponent : MonoBehaviour
         protected set { }
     }
 
-    public void Init(GameObject par, GuiRender ren)
+    public void Init(GuiRender ren)
     {
-        mPar = par;
         mGuiRender = ren;
     }
 
