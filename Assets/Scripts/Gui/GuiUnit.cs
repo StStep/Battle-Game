@@ -13,7 +13,7 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
     private Selector mSelector;
 
     // Static Objects
-    private ClickObject mCursorGhost;
+    private GameObject mCursorGhost;
     private SimUnit mSim;
     private SimCmd mSimCmd;
     private GuiCmd mGuiCmd;
@@ -26,9 +26,9 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
         mState = State.None;
         mSel = false;
 
-        // Static Init
+        // Static Init TODO Make only render
         mCursorGhost = Draw.MakeGhost(gameObject, mSelector);
-        mCursorGhost.Show(false);
+        mCursorGhost.GetComponent<RenderComponent>().Show(false);
         mSim = new SimUnit();
         mGuiCmd = new GuiCmd(gameObject, mSelector);
         mSimCmd = new SimCmd();
@@ -98,7 +98,7 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
         {
             mState = State.None;
             mGuiCmd.Retract();
-            mCursorGhost.Show(false);
+            mCursorGhost.GetComponent<RenderComponent>().Show(false);
             return;
         }
 
@@ -108,8 +108,8 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
         Ray2D dir = mSimCmd.FinalDir;
         float timeLeft = mSimCmd.TimeLeft;
 
-        mCursorGhost.Show(true);
-        mCursorGhost.Renderer.BadRender();
+        mCursorGhost.GetComponent<RenderComponent>().Show(true);
+        mCursorGhost.GetComponent<RenderComponent>().Renderer.BadRender();
         Path curPath = null;
 
         // Min Move Distance or Back Half
@@ -134,14 +134,14 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
             mGuiCmd.Stretch(curPath.RenderPoints(), pnt);
 
             // Place Ghost
-            mCursorGhost.Renderer.GoodRender();
+            mCursorGhost.GetComponent<RenderComponent>().Renderer.GoodRender();
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
-            mCursorGhost.SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
+            mCursorGhost.GetComponent<RenderComponent>().SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
         }
         else
         {
             mGuiCmd.Retract();
-            mCursorGhost.SetPos(pnt, Quaternion.identity);
+            mCursorGhost.GetComponent<RenderComponent>().SetPos(pnt, Quaternion.identity);
         }
 
         // If left Click and Path, Add Movement Segment
@@ -155,7 +155,7 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
                 mGuiCmd.Fin();
                 mState = State.None;
                 mGuiCmd.Retract();
-                mCursorGhost.Show(false);
+                mCursorGhost.GetComponent<RenderComponent>().Show(false);
             }
         }
     }

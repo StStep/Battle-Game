@@ -7,8 +7,8 @@ public class GuiCmd
 {
     // Static Objects
     private GameObject mParent;
-    private ClickObject mStartGhost;
-    private ClickObject mEndGhost;
+    private GameObject mStartGhost;
+    private GameObject mEndGhost;
     private LineRenderer mLrLGuide;
     private LineRenderer mLrRGuide;
     private LineRenderer mLrCGuide;
@@ -30,17 +30,27 @@ public class GuiCmd
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
         mEndGhost = Draw.MakeGhost(par, sel);
-        mEndGhost.Renderer.NeutralRender();
-        mEndGhost.LeftClick = () => ClickStart(false);
+        mEndGhost.GetComponent<RenderComponent>().Renderer.NeutralRender();
+        mEndGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(false);
 
         mStartGhost = Draw.MakeGhost(par, sel);
-        mStartGhost.Renderer.SelectedRender(false);
-        mStartGhost.LeftClick = () => ClickStart(true);
+        mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
+        mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
+        mStartGhost.GetComponent<SelectableComponent>().OnSelect = () =>
+        {
+            mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(true);
+            return true;
+        };
+        mStartGhost.GetComponent<SelectableComponent>().OnDeselect = () =>
+        {
+            mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
+            return true;
+        };
     }
 
     public void ClickStart(bool reset)
     {
-        if (!mStartGhost.ChainSelect())
+        if (!mStartGhost.GetComponent<SelectableComponent>().ChainSelect())
             return;
 
         if (reset)
@@ -59,8 +69,8 @@ public class GuiCmd
 
         LockIn(dir);
 
-        mEndGhost.Show(false);
-        mEndGhost.Renderer.NeutralRender();
+        mEndGhost.GetComponent<RenderComponent>().Show(false);
+        mEndGhost.GetComponent<RenderComponent>().Renderer.NeutralRender();
     }
 
     public void LockIn(Ray2D dir)
@@ -69,12 +79,12 @@ public class GuiCmd
         mLrMoves.Add(curMove);
 
         MoveGuides(dir);
-        mEndGhost.Show(true);
+        mEndGhost.GetComponent<RenderComponent>().Show(true);
     }
 
     public void Fin()
     {
-        mEndGhost.Renderer.LockRender();
+        mEndGhost.GetComponent<RenderComponent>().Renderer.LockRender();
     }
 
     public void Retract()
@@ -119,6 +129,6 @@ public class GuiCmd
         Draw.DrawLineRend(mLrLGuide, line);
 
         float ghRot = Vector2.SignedAngle(Vector2.up, dir.direction);
-        mEndGhost.SetPos(dir.origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
+        mEndGhost.GetComponent<RenderComponent>().SetPos(dir.origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
     }
 }

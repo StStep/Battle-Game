@@ -188,28 +188,27 @@ public static class Draw
     }
 
     // TODO Factory??
-    public static ClickObject MakeGhost(GameObject par, Selector sel)
+    public static GameObject MakeGhost(GameObject par, Selector sel)
     {
         GameObject g = new GameObject();
-        g.name = "CmdSegTip";
+        g.name = "Ghost";
         g.transform.parent = par.transform;
         g.transform.localPosition = Vector3.zero + Vector3.back;
         g.transform.localRotation = Quaternion.identity;
-        g.AddComponent<BoxCollider2D>();
 
-        // Sprite Render Init
-        SpriteRenderer mSr = par.GetComponent<SpriteRenderer>();
-
-        // Gui Tip Object
-        ClickObject tip = g.AddComponent<ClickObject>();
-        tip.Init(par, sel, new GhostRender(g, mSr.sprite));
+        // Get parent stuff
+        Vector2 size = par.GetComponent<BoxCollider2D>().size;
+        Sprite sprite = par.GetComponent<SpriteRenderer>().sprite;
 
         // Box Collider Init
-        BoxCollider2D bc = g.GetComponent<BoxCollider2D>();
-        BoxCollider2D mBc = par.GetComponent<BoxCollider2D>();
-        bc.size = mBc.size;
+        g.AddComponent<BoxCollider2D>().size = size;
 
-        return tip;
+        // Custom Component Init
+        g.AddComponent<ClickComponent>().Init();
+        g.AddComponent<RenderComponent>().Init(par, new GhostRender(g, sprite));
+        g.AddComponent<SelectableComponent>().Init(sel);
+
+        return g;
     }
 
 }
