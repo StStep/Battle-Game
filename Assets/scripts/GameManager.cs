@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static GameManager instance;
 
-    public SelectableComponent mSelector = null;
+    public SelectComponent mSelector = null;
 
     protected void Awake()
     {
@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
         //Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
 
-        mSelector = gameObject.AddComponent<SelectableComponent>();
+        mSelector = gameObject.AddComponent<SelectComponent>();
     }
 
     // Use this for initialization

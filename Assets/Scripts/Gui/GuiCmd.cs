@@ -36,24 +36,24 @@ public class GuiCmd
         mStartGhost = Draw.MakeGhost(par);
         mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
         mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
-        mStartGhost.GetComponent<SelectableComponent>().OnSelect = () =>
+        mStartGhost.GetComponent<SelectComponent>().OnSelect = () =>
         {
             mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(true);
             return true;
         };
-        mStartGhost.GetComponent<SelectableComponent>().OnDeselect = () =>
+        mStartGhost.GetComponent<SelectComponent>().OnDeselect = () =>
         {
             mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
             return true;
         };
 
         // TODO StopGap
-        mEndGhost.GetComponent<SelectableComponent>().Init(mStartGhost.GetComponent<SelectableComponent>());
+        mEndGhost.GetComponent<SelectComponent>().Init(mStartGhost.GetComponent<SelectComponent>());
     }
 
     public void ClickStart(bool reset)
     {
-        if (!mStartGhost.GetComponent<SelectableComponent>().ChainSelect())
+        if (!mStartGhost.GetComponent<SelectComponent>().ChainSelect())
             return;
 
         if (reset)

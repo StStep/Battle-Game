@@ -9,7 +9,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
 {
     // Status Member
     private State mState;
-    private SelectableComponent mSelector;
+    private SelectComponent mSelector;
 
     // Static Objects
     private GameObject mCursorGhost;
@@ -20,7 +20,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
     // Use this for initialization
     public void Start()
     {
-        mSelector = gameObject.AddComponent<SelectableComponent>();
+        mSelector = gameObject.AddComponent<SelectComponent>();
         mSelector.Init(GameManager.instance.mSelector);
         mSelector.OnSelect = () =>
         {

@@ -199,7 +199,7 @@ public static class Draw
         // Get parent stuff
         Vector2 size = par.GetComponent<BoxCollider2D>().size;
         Sprite sprite = par.GetComponent<SpriteRenderer>().sprite;
-        SelectableComponent sel = par.GetComponent<SelectableComponent>();
+        SelectComponent sel = par.GetComponent<SelectComponent>();
 
         // Box Collider Init
         g.AddComponent<BoxCollider2D>().size = size;
@@ -207,7 +207,7 @@ public static class Draw
         // Custom Component Init
         g.AddComponent<ClickComponent>().Init();
         g.AddComponent<RenderComponent>().Init(new GhostRender(g, sprite));
-        g.AddComponent<SelectableComponent>().Init(sel);
+        g.AddComponent<SelectComponent>().Init(sel);
 
         return g;
     }

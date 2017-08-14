@@ -3,13 +3,13 @@ using System.Collections;
 
 public delegate bool SelectDel();
 
-public class SelectableComponent : MonoBehaviour
+public class SelectComponent : MonoBehaviour
 {
     public SelectDel OnSelect = null;
     public SelectDel OnDeselect = null;
 
-    private SelectableComponent mPar = null;
-    private SelectableComponent mChild = null;
+    private SelectComponent mPar = null;
+    private SelectComponent mChild = null;
 
     bool _selected = false;
     public bool Selected
@@ -19,7 +19,7 @@ public class SelectableComponent : MonoBehaviour
     }
 
     // Constructor
-    public void Init(SelectableComponent parent)
+    public void Init(SelectComponent parent)
     {
         mPar = parent;
     }
@@ -30,7 +30,6 @@ public class SelectableComponent : MonoBehaviour
     /// <returns>True if sucessfully selected form highest parent</returns>
     public bool ChainSelect()
     {
-        Debug.Log("Select " + gameObject.name);
         bool ret = true;
         if (mPar != null)
         {
@@ -45,8 +44,6 @@ public class SelectableComponent : MonoBehaviour
     /// <returns>Returns true if successfully deselect from self to lowest child</returns>
     public bool ChainDeselect()
     {
-        Debug.Log("Deselect " + gameObject.name);
-
         if (mChild != null && !mChild.ChainDeselect())
             return false;
         mChild = null;
@@ -58,7 +55,7 @@ public class SelectableComponent : MonoBehaviour
         return true;
     }
 
-    private bool SelectChild(SelectableComponent obj)
+    private bool SelectChild(SelectComponent obj)
     {
         if (!ChainSelect())
         {
