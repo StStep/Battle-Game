@@ -3,13 +3,13 @@ using System.Collections;
 
 public delegate bool SelectDel();
 
-public class SelectableComponent : MonoBehaviour, ISelectorItem
+public class SelectableComponent : MonoBehaviour
 {
     public SelectDel OnSelect = null;
     public SelectDel OnDeselect = null;
 
-    // Status Members
-    private Selector mSelector = null;
+    private SelectableComponent mPar = null;
+    private SelectableComponent mChild = null;
 
     bool _selected = false;
     public bool Selected
@@ -18,34 +18,100 @@ public class SelectableComponent : MonoBehaviour, ISelectorItem
         protected set { _selected = value; }
     }
 
-    public void Init(Selector sel)
+    // Constructor
+    public void Init(SelectableComponent parent)
     {
-        mSelector = new Selector(gameObject.name, sel, this);
+        mPar = parent;
     }
 
+    /// <summary>
+    /// Select self from the highest parent downwards.
+    /// </summary>
+    /// <returns>True if sucessfully selected form highest parent</returns>
     public bool ChainSelect()
     {
-        return mSelector.ChainSelect();
+        Debug.Log("Select " + gameObject.name);
+        bool ret = true;
+        if (mPar != null)
+        {
+            ret = mPar.SelectChild(this);
+        }
+        return ret;
     }
 
-    #region ISelectorItem
-    //////////////////////// ISelectorItem ///////////////////////////////
-
-    public bool SelectSelf()
+    /// <summary>
+    /// Deselect from self to lowest child.
+    /// </summary>
+    /// <returns>Returns true if successfully deselect from self to lowest child</returns>
+    public bool ChainDeselect()
     {
-        Selected = true;
+        Debug.Log("Deselect " + gameObject.name);
+
+        if (mChild != null && !mChild.ChainDeselect())
+            return false;
+        mChild = null;
+
+        // Deslect self
+        if (!DeselectSelf())
+            return false;
+
+        return true;
+    }
+
+    private bool SelectChild(SelectableComponent obj)
+    {
+        if (!ChainSelect())
+        {
+            return false;
+        }
+
+        bool ret = true;
+        if (mChild == null)
+        {
+            if (obj.SelectSelf())
+                mChild = obj;
+            else
+                ret = false;
+        }
+        else if (obj != mChild)
+        {
+            if (mChild.ChainDeselect())
+            {
+                mChild = null;
+                if (obj.SelectSelf())
+                    mChild = obj;
+                else
+                    ret = false;
+            }
+            else
+            {
+                ret = false;
+            }
+        }
+        else
+        {
+            // Currently selected
+        }
+        return ret;
+    }
+
+    private bool SelectSelf()
+    {
+        bool ret = true;
         if (OnSelect != null)
-            return OnSelect();
-        return true;
+            ret = OnSelect();
+        if(ret)
+            Selected = true;
+        return ret;
     }
 
-    public bool DeselectSelf()
+    private bool DeselectSelf()
     {
-        Selected = false;
+        bool ret = true;
         if (OnDeselect != null)
-            return OnDeselect();
-        return true;
+            ret = OnDeselect();
+        if (ret)
+            Selected = false;
+        return ret;
     }
-    /////////////////////////////////////////////////////////////////////
-    #endregion
 }

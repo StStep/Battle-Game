@@ -18,7 +18,7 @@ public class GuiCmd
     // Dynamic Objects
     private List<LineRenderer> mLrMoves;
 
-    public GuiCmd(GameObject par, Selector sel)
+    public GuiCmd(GameObject par)
     {
         mLrMoves = new List<LineRenderer>();
         mParent = par;
@@ -29,11 +29,11 @@ public class GuiCmd
         mLrCGuide = Draw.CreateLineRend(par, "CenterGuide", Color.green);
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
-        mEndGhost = Draw.MakeGhost(par, sel);
+        mEndGhost = Draw.MakeGhost(par);
         mEndGhost.GetComponent<RenderComponent>().Renderer.NeutralRender();
         mEndGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(false);
 
-        mStartGhost = Draw.MakeGhost(par, sel);
+        mStartGhost = Draw.MakeGhost(par);
         mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
         mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
         mStartGhost.GetComponent<SelectableComponent>().OnSelect = () =>
@@ -46,6 +46,9 @@ public class GuiCmd
             mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
             return true;
         };
+
+        // TODO StopGap
+        mEndGhost.GetComponent<SelectableComponent>().Init(mStartGhost.GetComponent<SelectableComponent>());
     }
 
     public void ClickStart(bool reset)

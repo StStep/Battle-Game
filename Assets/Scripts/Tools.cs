@@ -188,7 +188,7 @@ public static class Draw
     }
 
     // TODO Factory??
-    public static GameObject MakeGhost(GameObject par, Selector sel)
+    public static GameObject MakeGhost(GameObject par)
     {
         GameObject g = new GameObject();
         g.name = "Ghost";
@@ -199,6 +199,7 @@ public static class Draw
         // Get parent stuff
         Vector2 size = par.GetComponent<BoxCollider2D>().size;
         Sprite sprite = par.GetComponent<SpriteRenderer>().sprite;
+        SelectableComponent sel = par.GetComponent<SelectableComponent>();
 
         // Box Collider Init
         g.AddComponent<BoxCollider2D>().size = size;

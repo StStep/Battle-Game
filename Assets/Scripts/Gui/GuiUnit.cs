@@ -5,12 +5,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
-public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
+public class GuiUnit : MonoBehaviour, ICommandRef
 {
     // Status Member
-    private bool mSel;
     private State mState;
-    private Selector mSelector;
+    private SelectableComponent mSelector;
 
     // Static Objects
     private GameObject mCursorGhost;
@@ -21,21 +20,35 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
     // Use this for initialization
     public void Start()
     {
+        mSelector = gameObject.AddComponent<SelectableComponent>();
+        mSelector.Init(GameManager.instance.mSelector);
+        mSelector.OnSelect = () =>
+        {
+            mGuiCmd.EnableGuides(true);
+            return true;
+        };
+        mSelector.OnDeselect = () =>
+        {
+            if (mState != State.None)
+                return false;
+
+            mGuiCmd.EnableGuides(false);
+            return true;
+        };
+
         // Status Members
-        mSelector = new Selector(gameObject.name, GameManager.instance.mSelector, this);
         mState = State.None;
-        mSel = false;
 
         // Static Init TODO Make only render
-        mCursorGhost = Draw.MakeGhost(gameObject, mSelector);
+        mCursorGhost = Draw.MakeGhost(gameObject);
         mCursorGhost.GetComponent<RenderComponent>().Show(false);
         mSim = new SimUnit();
-        mGuiCmd = new GuiCmd(gameObject, mSelector);
+        mGuiCmd = new GuiCmd(gameObject);
         mSimCmd = new SimCmd();
+        mGuiCmd.EnableGuides(false);
 
         // Startup Functions
         ResetPath();
-        DeselectSelf();
     }
 
     // Update is called once per frame
@@ -160,29 +173,5 @@ public class GuiUnit : MonoBehaviour, ISelectorItem, ICommandRef
         }
     }
 
-    #endregion
-
-    #region ISelectorItem
-    //////////////////////// ISelectorItem ///////////////////////////////
-
-    public bool SelectSelf()
-    {
-        mSel = true;
-        mGuiCmd.EnableGuides(true);
-
-        return true;
-    }
-
-    public bool DeselectSelf()
-    {
-        // Only deslect if doing nothing
-        if (mState != State.None)
-            return false;
-
-        mSel = false;
-        mGuiCmd.EnableGuides(false);
-        return true;
-    }
-    /////////////////////////////////////////////////////////////////////
     #endregion
 }
