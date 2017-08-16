@@ -41,7 +41,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
 
         // Static Init TODO Make only render
         mCursorGhost = Draw.MakeGhost(gameObject);
-        mCursorGhost.GetComponent<RenderComponent>().Show(false);
+        mCursorGhost.SetActive(false);
         mSim = new SimUnit();
         mGuiCmd = new GuiCmd(gameObject);
         mSimCmd = new SimCmd();
@@ -111,7 +111,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
         {
             mState = State.None;
             mGuiCmd.Retract();
-            mCursorGhost.GetComponent<RenderComponent>().Show(false);
+            mCursorGhost.SetActive(false);
             return;
         }
 
@@ -121,8 +121,8 @@ public class GuiUnit : MonoBehaviour, ICommandRef
         Ray2D dir = mSimCmd.FinalDir;
         float timeLeft = mSimCmd.TimeLeft;
 
-        mCursorGhost.GetComponent<RenderComponent>().Show(true);
-        mCursorGhost.GetComponent<RenderComponent>().Renderer.BadRender();
+        mCursorGhost.SetActive(true);
+        mCursorGhost.GetComponent<SpriteRenderer>().color = Color.red - new Color(0, 0, 0, .7f);
         Path curPath = null;
 
         // Min Move Distance or Back Half
@@ -147,14 +147,16 @@ public class GuiUnit : MonoBehaviour, ICommandRef
             mGuiCmd.Stretch(curPath.RenderPoints(), pnt);
 
             // Place Ghost
-            mCursorGhost.GetComponent<RenderComponent>().Renderer.GoodRender();
+            mCursorGhost.GetComponent<SpriteRenderer>().color = Color.green - new Color(0, 0, 0, .7f);
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
-            mCursorGhost.GetComponent<RenderComponent>().SetPos(curPath.End, Quaternion.AngleAxis(ghRot, Vector3.forward));
+            mCursorGhost.transform.position = curPath.End;
+            mCursorGhost.transform.rotation = Quaternion.AngleAxis(ghRot, Vector3.forward);
         }
         else
         {
             mGuiCmd.Retract();
-            mCursorGhost.GetComponent<RenderComponent>().SetPos(pnt, Quaternion.identity);
+            mCursorGhost.transform.position = pnt;
+            mCursorGhost.transform.rotation = Quaternion.identity;
         }
 
         // If left Click and Path, Add Movement Segment
@@ -168,7 +170,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
                 mGuiCmd.Fin();
                 mState = State.None;
                 mGuiCmd.Retract();
-                mCursorGhost.GetComponent<RenderComponent>().Show(false);
+                mCursorGhost.SetActive(false);
             }
         }
     }

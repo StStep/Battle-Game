@@ -30,20 +30,20 @@ public class GuiCmd
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
         mEndGhost = Draw.MakeGhost(par);
-        mEndGhost.GetComponent<RenderComponent>().Renderer.NeutralRender();
+        mEndGhost.GetComponent<SpriteRenderer>().color = Color.white;
         mEndGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(false);
 
         mStartGhost = Draw.MakeGhost(par);
-        mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
+        mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
         mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
         mStartGhost.GetComponent<SelectComponent>().OnSelect = () =>
         {
-            mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(true);
+            mStartGhost.GetComponent<SpriteRenderer>().color = Color.yellow;
             return true;
         };
         mStartGhost.GetComponent<SelectComponent>().OnDeselect = () =>
         {
-            mStartGhost.GetComponent<RenderComponent>().Renderer.SelectedRender(false);
+            mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
             return true;
         };
 
@@ -72,8 +72,8 @@ public class GuiCmd
 
         LockIn(dir);
 
-        mEndGhost.GetComponent<RenderComponent>().Show(false);
-        mEndGhost.GetComponent<RenderComponent>().Renderer.NeutralRender();
+        mEndGhost.SetActive(false);
+        mEndGhost.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     public void LockIn(Ray2D dir)
@@ -82,12 +82,12 @@ public class GuiCmd
         mLrMoves.Add(curMove);
 
         MoveGuides(dir);
-        mEndGhost.GetComponent<RenderComponent>().Show(true);
+        mEndGhost.SetActive(true);
     }
 
     public void Fin()
     {
-        mEndGhost.GetComponent<RenderComponent>().Renderer.LockRender();
+        mEndGhost.GetComponent<SpriteRenderer>().color = Color.green;
     }
 
     public void Retract()
@@ -132,6 +132,7 @@ public class GuiCmd
         Draw.DrawLineRend(mLrLGuide, line);
 
         float ghRot = Vector2.SignedAngle(Vector2.up, dir.direction);
-        mEndGhost.GetComponent<RenderComponent>().SetPos(dir.origin, Quaternion.AngleAxis(ghRot, Vector3.forward));
+        mEndGhost.transform.position = dir.origin;
+        mEndGhost.transform.rotation = Quaternion.AngleAxis(ghRot, Vector3.forward);
     }
 }

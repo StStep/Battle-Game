@@ -206,7 +206,7 @@ public static class Draw
 
         // Custom Component Init
         g.AddComponent<ClickComponent>().Init();
-        g.AddComponent<RenderComponent>().Init(new GhostRender(g, sprite));
+        g.AddComponent<SpriteRenderer>().sprite = sprite;
         g.AddComponent<SelectComponent>().Init(sel);
 
         return g;
