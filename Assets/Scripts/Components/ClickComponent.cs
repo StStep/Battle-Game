@@ -18,8 +18,10 @@ public class ClickComponent : MonoBehaviour
     public ClickDel OnHoldLeftClick = null;
     public ClickDel OnHoldMiddleClick = null;
 
-    public void Init()
-    { }
+    public ClickComponent Init()
+    {
+        return this;
+    }
 
     #region MouseIF
     //////////////////////// MouseIF ///////////////////////////////

@@ -59,7 +59,7 @@ public class GuiCmd
         if (reset)
             cmdRef.ResetPath();
 
-        cmdRef.SetState(State.Moving);
+        cmdRef.SetMoving();
     }
 
     public void Reset(Ray2D dir)

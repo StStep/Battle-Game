@@ -8,8 +8,8 @@ using UnityEngine.EventSystems;
 public class GuiUnit : MonoBehaviour, ICommandRef
 {
     // Status Member
-    private State mState;
-    private SelectComponent mSelector;
+    private State mState = State.None;
+    private bool busy = false;
 
     // Static Objects
     private GameObject mCursorGhost;
@@ -20,24 +20,21 @@ public class GuiUnit : MonoBehaviour, ICommandRef
     // Use this for initialization
     public void Start()
     {
-        mSelector = gameObject.AddComponent<SelectComponent>();
-        mSelector.Init(GameManager.instance.mSelector);
-        mSelector.OnSelect = () =>
+        SelectComponent s = gameObject.AddComponent<SelectComponent>();
+        s.Init(GameManager.instance.mSelector);
+        s.OnSelect = () =>
         {
             mGuiCmd.EnableGuides(true);
             return true;
         };
-        mSelector.OnDeselect = () =>
+        s.OnDeselect = () =>
         {
-            if (mState != State.None)
+            if (busy)
                 return false;
 
             mGuiCmd.EnableGuides(false);
             return true;
         };
-
-        // Status Members
-        mState = State.None;
 
         // Static Init TODO Make only render
         mCursorGhost = Draw.MakeGhost(gameObject);
@@ -76,28 +73,25 @@ public class GuiUnit : MonoBehaviour, ICommandRef
         mGuiCmd.Reset(dir);
     }
 
-    public bool SetState(State st)
+    public bool SetMoving()
     {
-        if (mState != State.None && st != State.None)
+        if (mState != State.None)
             return false;
 
         bool ret = false;
-        switch (st)
+        if (mSimCmd.TimeLeft > float.Epsilon)
         {
-            case State.Moving:
-                if (mSimCmd.TimeLeft > float.Epsilon)
-                {
-                    mState = State.Moving;
-                    ret = true;
-                }
-                break;
-            default:
-                mState = State.None;
-                ret = true;
-                break;
+            mState = State.Moving;
+            busy = true;
+            ret = true;
         }
 
         return ret;
+    }
+
+    private void NotBusy()
+    {
+        busy = false;
     }
 
     #endregion
@@ -112,6 +106,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
             mState = State.None;
             mGuiCmd.Retract();
             mCursorGhost.SetActive(false);
+            Invoke("NotBusy", .2f);
             return;
         }
 
@@ -169,6 +164,7 @@ public class GuiUnit : MonoBehaviour, ICommandRef
             {
                 mGuiCmd.Fin();
                 mState = State.None;
+                Invoke("NotBusy", .2f);
                 mGuiCmd.Retract();
                 mCursorGhost.SetActive(false);
             }

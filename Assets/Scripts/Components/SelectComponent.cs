@@ -19,9 +19,10 @@ public class SelectComponent : MonoBehaviour
     }
 
     // Constructor
-    public void Init(SelectComponent parent)
+    public SelectComponent Init(SelectComponent parent)
     {
         mPar = parent;
+        return this;
     }
 
     /// <summary>
@@ -44,13 +45,13 @@ public class SelectComponent : MonoBehaviour
     /// <returns>Returns true if successfully deselect from self to lowest child</returns>
     public bool ChainDeselect()
     {
-        if (mChild != null && !mChild.ChainDeselect())
-            return false;
-        mChild = null;
-
         // Deslect self
         if (!DeselectSelf())
             return false;
+
+        if (mChild != null && !mChild.ChainDeselect())
+            return false;
+        mChild = null;
 
         return true;
     }

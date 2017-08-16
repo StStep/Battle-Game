@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         mSelector = gameObject.AddComponent<SelectComponent>();
+
+        // Make Initial gamestate
+        MakeBackground();
     }
 
     // Use this for initialization
@@ -59,4 +62,21 @@ public class GameManager : MonoBehaviour
         //}
         //Debug.Log(string.Format("Pressed a button with {0} selected", name));
     }
+
+    #region GameCreation
+
+    private GameObject MakeBackground()
+    {
+        GameObject g = new GameObject();
+        g.name = "Background";
+        g.transform.position = new Vector3(0, 0, 5);
+        g.AddComponent<BoxCollider2D>().size = new Vector2(30, 30);
+        ClickComponent c = g.AddComponent<ClickComponent>().Init();
+        c.OnLeftClick = () => instance.mSelector.ChainDeselect();
+        c.OnRightClick = () => instance.mSelector.ChainDeselect();
+
+        return g;
+    }
+
+    #endregion
 }
