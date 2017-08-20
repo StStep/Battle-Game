@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,6 +44,16 @@ public class GameManager : MonoBehaviour
 
         // Make Initial gamestate
         MakeBackground();
+
+        // Make test units
+        GameObject u = new GameObject();
+        u.name = "Units";
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        MakeUnit(u, "Example Unit 1", Vector2.zero, 0);
+        MakeUnit(u, "Example Unit 2", new Vector2(.5f, 2), -45);
+        MakeUnit(u, "Example Unit 3", new Vector2(3, 2), -90);
+        MakeUnit(u, "Example Unit 4", new Vector2(-2, -3), 135);
     }
 
     // Use this for initialization
@@ -74,6 +85,25 @@ public class GameManager : MonoBehaviour
         ClickComponent c = g.AddComponent<ClickComponent>().Init();
         c.OnLeftClick = () => instance.mSelector.ChainDeselect();
         c.OnRightClick = () => instance.mSelector.ChainDeselect();
+
+        return g;
+    }
+
+    private GameObject MakeUnit(GameObject par,string name, Vector2 pos, float rot)
+    {
+        GameObject g = new GameObject();
+        g.name = name;
+        g.transform.parent = par.transform;
+        g.transform.localPosition = Vector3.zero;
+        g.transform.localRotation = Quaternion.identity;
+        g.transform.position = new Vector3(pos.x, pos.y, 0);
+        g.transform.rotation = Quaternion.AngleAxis(rot, Vector3.forward);
+        g.AddComponent<BoxCollider2D>().size = new Vector2(1.357859f, 0.6493425f);
+        Sprite sp = Resources.Load<Sprite>("Sprites/Unit_Arr");
+        if (sp == null)
+            throw new Exception("Failed to import sprite");
+        g.AddComponent<SpriteRenderer>().sprite = sp;
+        g.AddComponent<GuiUnit>();
 
         return g;
     }
