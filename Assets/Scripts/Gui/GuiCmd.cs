@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class GuiCmd
@@ -9,24 +7,24 @@ public class GuiCmd
     private GameObject mParent;
     private GameObject mStartGhost;
     private GameObject mEndGhost;
-    private LineRenderer mLrLGuide;
-    private LineRenderer mLrRGuide;
-    private LineRenderer mLrCGuide;
+    private LineRenderer mLGuide;
+    private LineRenderer mRGuide;
+    private LineRenderer mCGuide;
     private LineRenderer mGapLine;
     protected ICommandRef cmdRef;
 
     // Dynamic Objects
-    private List<LineRenderer> mLrMoves;
+    private List<PathComponent> mMoves;
 
     public GuiCmd(GameObject par)
     {
-        mLrMoves = new List<LineRenderer>();
+        mMoves = new List<PathComponent>();
         mParent = par;
         cmdRef = par.GetComponent<GuiUnit>();
 
-        mLrLGuide = Draw.CreateLineRend(par, "LeftGuide", Color.yellow);
-        mLrRGuide = Draw.CreateLineRend(par, "RightGuide", Color.yellow);
-        mLrCGuide = Draw.CreateLineRend(par, "CenterGuide", Color.green);
+        mLGuide = Draw.CreateLineRend(par, "LeftGuide", Color.yellow);
+        mRGuide = Draw.CreateLineRend(par, "RightGuide", Color.yellow);
+        mCGuide = Draw.CreateLineRend(par, "CenterGuide", Color.green);
         mGapLine = Draw.CreateLineRend(par, "GapLine", Color.blue);
 
         mEndGhost = Draw.MakeGhost(par);
@@ -64,11 +62,11 @@ public class GuiCmd
 
     public void Reset(Ray2D dir)
     {
-        foreach (LineRenderer lr in mLrMoves)
+        foreach (PathComponent o in mMoves)
         {
-            UnityEngine.Object.Destroy(lr);
+            UnityEngine.Object.Destroy(o.gameObject);
         }
-        mLrMoves.Clear();
+        mMoves.Clear();
 
         LockIn(dir);
 
@@ -78,8 +76,8 @@ public class GuiCmd
 
     public void LockIn(Ray2D dir)
     {
-        LineRenderer curMove = Draw.CreateLineRend(mParent, "MovementLine", Color.red);
-        mLrMoves.Add(curMove);
+        PathComponent curMove = Draw.CreatePathObject(mParent);
+        mMoves.Add(curMove);
 
         MoveGuides(dir);
         mEndGhost.SetActive(true);
@@ -92,13 +90,13 @@ public class GuiCmd
 
     public void Retract()
     {
-        mLrMoves[mLrMoves.Count - 1].positionCount = 0;
+        mMoves[mMoves.Count - 1].Zero();
         mGapLine.positionCount = 0;
     }
 
     public void Stretch(Vector3[] pnts, Vector3 mouse)
     {
-        Draw.DrawLineRend(mLrMoves[mLrMoves.Count - 1], pnts);
+        mMoves[mMoves.Count - 1].RenderPoints = pnts;
 
         Vector3[] gap = new Vector3[2];
         gap[0] = pnts[pnts.Length - 1];
@@ -109,9 +107,9 @@ public class GuiCmd
 
     public void EnableGuides(bool en)
     {
-        mLrLGuide.enabled = en;
-        mLrRGuide.enabled = en;
-        mLrCGuide.enabled = en;
+        mLGuide.enabled = en;
+        mRGuide.enabled = en;
+        mCGuide.enabled = en;
     }
 
     private void MoveGuides(Ray2D dir)
@@ -121,15 +119,15 @@ public class GuiCmd
 
         line[1] = 100 * dir.direction;
         line[1] += line[0];
-        Draw.DrawLineRend(mLrCGuide, line);
+        Draw.DrawLineRend(mCGuide, line);
 
         Vector3 rightGuideDir = Quaternion.AngleAxis(-45f, Vector3.forward) * dir.direction;
         line[1] = 100 * rightGuideDir + line[0];
-        Draw.DrawLineRend(mLrRGuide, line);
+        Draw.DrawLineRend(mRGuide, line);
 
         Vector3 leftGuideDir = Quaternion.AngleAxis(45f, Vector3.forward) * dir.direction;
         line[1] = 100 * leftGuideDir + line[0];
-        Draw.DrawLineRend(mLrLGuide, line);
+        Draw.DrawLineRend(mLGuide, line);
 
         float ghRot = Vector2.SignedAngle(Vector2.up, dir.direction);
         mEndGhost.transform.position = dir.origin;

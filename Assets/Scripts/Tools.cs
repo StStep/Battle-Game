@@ -170,8 +170,7 @@ public static class Draw
         myLine.name = name;
         myLine.transform.parent = parent.transform;
         myLine.transform.position = parent.transform.position;
-        myLine.AddComponent<LineRenderer>();
-        LineRenderer lr = myLine.GetComponent<LineRenderer>();
+        LineRenderer lr = myLine.AddComponent<LineRenderer>();
         lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
         lr.startColor = color;
         lr.endColor = color;
@@ -179,6 +178,16 @@ public static class Draw
         lr.endWidth = 0.05f;
         lr.positionCount = 0;
         return lr;
+    }
+
+    public static PathComponent CreatePathObject(GameObject parent)
+    {
+        GameObject g = new GameObject();
+        g.name = "Path";
+        g.transform.parent = parent.transform;
+        g.transform.position = parent.transform.position;
+        PathComponent path = g.AddComponent<PathComponent>();
+        return path;
     }
 
     public static void DrawLineRend(LineRenderer lr, Vector3[] pnts)
