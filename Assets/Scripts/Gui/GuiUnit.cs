@@ -232,12 +232,10 @@ public class GuiUnit : MonoBehaviour
             Stretch(curPath.RenderPoints(), pnt);
 
             // Place Ghost
-#if false
             mCursorGhost.GetComponent<SpriteRenderer>().color = Color.green - new Color(0, 0, 0, .7f);
             float ghRot = Vector2.SignedAngle(Vector2.up, curPath.EndDir);
             mCursorGhost.transform.position = curPath.End;
             mCursorGhost.transform.rotation = Quaternion.AngleAxis(ghRot, Vector3.forward);
-#endif
         }
         else
         {

@@ -25,6 +25,16 @@ public abstract class MoveCmd : MonoBehaviour, ICommandSegment
         protected set;
     }
 
+    abstract public Vector3 End
+    {
+        get;
+    }
+
+    abstract public Vector3 EndDir
+    {
+        get;
+    }
+
     public Ray2D GetDir()
     {
         return new Ray2D(transform.position, transform.up);
@@ -101,14 +111,14 @@ public class LineMoveCmd : MoveCmd
         protected set { }
     }
 
-    private Vector3 End()
+    public override Vector3 End
     {
-        return transform.position + mLength * transform.up;
+        get { return transform.position + mLength * transform.up; }
     }
 
-    private Vector3 End(float dist)
+    public override Vector3 EndDir
     {
-        return transform.position + dist * transform.up;
+        get { return transform.up; }
     }
 
     public void Start()
@@ -136,14 +146,14 @@ public class LineMoveCmd : MoveCmd
     {
         Vector3[] pnts = new Vector3[2];
         pnts[0] = new Vector3(transform.position.x, transform.position.y, 0f);
-        pnts[1] = End();
+        pnts[1] = End;
         return pnts;
     }
 
     public override Vector2 GetPointDist(float dist)
     {
         float d = (dist >= mLength) ? mLength : dist;
-        return End(d);
+        return transform.position + d * transform.up;
     }
 
     public override Ray2D Translate(Ray2D init)
@@ -151,7 +161,7 @@ public class LineMoveCmd : MoveCmd
         transform.position = init.origin;
         float ang = Vector2.Angle(transform.up, init.direction);
         transform.Rotate(Vector3.forward, ang);
-        return new Ray2D(End(), transform.up);
+        return new Ray2D(End, transform.up);
     }
 }
 
