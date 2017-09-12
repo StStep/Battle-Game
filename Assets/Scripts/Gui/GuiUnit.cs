@@ -5,8 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 // TODO
-// Put path into move object?? Somehow
-// Move command esque stuff away from path into move cmd
+// Missing Time limit when clicking
 
 // Primary Unit GUI, Controls State
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
@@ -229,12 +228,12 @@ public class GuiUnit : MonoBehaviour
         else if(Trig.DistToLine(dir, pnt) < GameManager.MOVE_LINE_TOL
             || Vector2.Distance(dir.origin, Trig.NearestPointOnLine(dir, pnt)) < GameManager.MOVE_MIN_ARC_DIST)
         {
-            curPath = new LinePath(timeLeft, dir, pnt);
+            curPath = new LinePath(dir, pnt);
         }
         // Else Arc
         else
         {
-            curPath = new ArcPath(timeLeft, dir, pnt);
+            curPath = new ArcPath(dir, pnt);
         }
 
         if(curPath != null)
@@ -258,10 +257,11 @@ public class GuiUnit : MonoBehaviour
         // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
-            //mCmds.Add(curPath);
-            //mGuiCmd.LockIn(mSimCmd.FinalDir);
+            mEndGhost.SetActive(true);
+            mCmds.Add(Draw.MakeMoveCmd(gameObject, curPath));
+            MoveGuides(mCmds.FinalDir(new Ray2D(transform.position, transform.up)));
 
-            if(mCmds.TimeLeft < float.Epsilon)
+            if (mCmds.TimeLeft < float.Epsilon)
             {
                 Fin();
                 mState = State.None;

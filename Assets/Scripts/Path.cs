@@ -41,22 +41,14 @@ public abstract class Path
         protected set;
     }
 
-    // TODO Assumes same speed across whole thing
-    public float Time
-    {
-        get { return Length / GameManager.DEFAULT_SPEED; }
-
-        protected set { }
-    }
-
-    public Path(float time, Ray2D dir, Vector2 pnt)
+    public Path(Ray2D dir, Vector2 pnt)
     {
         // Set Minimum input
         Start = dir.origin;
         StartDir = dir.direction;
 
         // First Calculate
-        Recalculate(time, pnt);
+        Recalculate(pnt);
     }
 
     public virtual Vector3[] DebugRenderPoints()
@@ -68,15 +60,9 @@ public abstract class Path
 
     abstract public Vector2 GetPointDist(float dist);
 
-    public Vector2 GetPointTime(float time)
-    {
-        float maxDist = time * GameManager.DEFAULT_SPEED;
-        return GetPointDist(maxDist);
-    }
+    abstract public Ray2D Translate(Ray2D dir);
 
-    abstract protected void Translate(Ray2D dir);
-
-    abstract protected void Recalculate(float time, Vector2 pnt);
+    abstract protected void Recalculate(Vector2 pnt);
 
     public virtual void LocalToWorld(Transform refT)
     {
@@ -90,48 +76,6 @@ public abstract class Path
         StartDir = refT.InverseTransformDirection(StartDir);
         Start = refT.InverseTransformPoint(Start);
         End = refT.InverseTransformPoint(End);
-    }
-}
-
-public class PointPath : Path
-{
-    override public Vector2 EndDir
-    {
-        get { return StartDir; }
-        protected set { }
-    }
-
-    override public float Length
-    {
-        get { return 0; }
-        protected set { }
-    }
-
-    public PointPath(Ray2D dir) : base(0, dir, Vector2.zero)
-    { }
-
-    public override Vector3[] RenderPoints()
-    {
-        Vector3[] pnts = new Vector3[1];
-        pnts[0] = new Vector3(Start.x, Start.y, 0f);
-        return pnts;
-    }
-
-    public override Vector2 GetPointDist(float dist)
-    {
-        return Start;
-    }
-
-    protected override void Translate(Ray2D dir)
-    {
-        Start = dir.origin;
-        StartDir = dir.direction;
-        End = Start;
-    }
-
-    protected override void Recalculate(float time, Vector2 pnt)
-    {
-        End = Start;
     }
 }
 
@@ -152,7 +96,7 @@ public class LinePath : Path
         protected set { }
     }
 
-    public LinePath(float time, Ray2D dir, Vector2 pnt) : base(time, dir, pnt)
+    public LinePath(Ray2D dir, Vector2 pnt) : base(dir, pnt)
     { }
 
     public override Vector3[] RenderPoints()
@@ -170,24 +114,18 @@ public class LinePath : Path
         return Start + StartDir * dist;
     }
 
-    protected override void Translate(Ray2D dir)
+    public override Ray2D Translate(Ray2D dir)
     {
         Start = dir.origin;
         StartDir = dir.direction;
         End = Start + StartDir * mLength;
+        return new Ray2D(End, EndDir);
     }
 
-    protected override void Recalculate(float time, Vector2 pnt)
+    protected override void Recalculate(Vector2 pnt)
     {
         End = Trig.NearestPointOnLine(new Ray2D(Start, StartDir), pnt);
         mLength = Vector2.Distance(Start, End);
-
-        // Recalc if too long
-        if (mLength / GameManager.DEFAULT_SPEED > time)
-        {
-            End = GetPointTime(time);
-            mLength = Vector2.Distance(Start, End);
-        }
     }
 }
 
@@ -214,7 +152,7 @@ public class ArcPath : Path
         protected set { }
     }
 
-    public ArcPath(float time, Ray2D dir, Vector2 pnt) : base(time, dir, pnt)
+    public ArcPath(Ray2D dir, Vector2 pnt) : base(dir, pnt)
     { }
 
     public override Vector3[] RenderPoints()
@@ -276,12 +214,12 @@ public class ArcPath : Path
         return pnt;
     }
 
-    protected override void Translate(Ray2D dir)
+    public override Ray2D Translate(Ray2D dir)
     {
         throw new NotImplementedException();
     }
 
-    protected override void Recalculate(float time, Vector2 pnt)
+    protected override void Recalculate(Vector2 pnt)
     {
         Ray2D dir = new Ray2D(Start, StartDir);
         Trig.Quarter q = Trig.GetQuarter(dir, pnt, 0, 0);
@@ -314,17 +252,6 @@ public class ArcPath : Path
 
         mRawAngle = Vector2.SignedAngle(Start - mCenter, End - mCenter);
         mArcLength = 2 * Mathf.PI * mRadius * (Mathf.Abs(mRawAngle) / 360f);
-
-        // Recalc if too long
-        if (mArcLength / GameManager.DEFAULT_SPEED > time)
-        {
-            End = GetPointTime(time);
-            mRawAngle = Vector2.SignedAngle(Start - mCenter, End - mCenter);
-            mArcLength = 2 * Mathf.PI * mRadius * (Mathf.Abs(mRawAngle) / 360f);
-            Vector2 leg = End - mCenter;
-            float ang = (mRawAngle < 0) ? -90 : 90;
-            mFinalDir = Quaternion.AngleAxis(ang, Vector3.forward) * leg.normalized;
-        }
     }
 
     public override void LocalToWorld(Transform refT)

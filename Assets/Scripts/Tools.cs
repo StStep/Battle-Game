@@ -204,7 +204,7 @@ public static class Draw
         return g;
     }
 
-    public static MoveCmd MakeLineMoveCmd(GameObject par, Ray2D dir, Vector2 pnt, float time)
+    public static MoveCmd MakeMoveCmd(GameObject par, Path path)
     {
         GameObject g = new GameObject();
         g.name = "LineMoveCmd";
@@ -212,10 +212,7 @@ public static class Draw
         g.transform.localPosition = Vector3.zero + Vector3.back;
         g.transform.localRotation = Quaternion.identity;
 
-        // Custom Component Init
-        MoveCmd ret = g.AddComponent<LineMoveCmd>().Init(pnt, time);
-        ret.Translate(dir);
-        return ret;
+        return g.AddComponent<MoveCmd>().Init(path);
     }
 
 }
