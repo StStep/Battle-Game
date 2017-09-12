@@ -22,10 +22,12 @@ public class PathComponent : MonoBehaviour
         mLr.positionCount = 0;
     }
 
-    public void Init(Color col)
+    public PathComponent Init(Color col)
     {
         mLr.startColor = col;
         mLr.endColor = col;
+
+        return this;
     }
 
     private Vector3[] _points;

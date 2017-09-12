@@ -170,9 +170,7 @@ public static class Draw
         g.name = name;
         g.transform.parent = parent.transform;
         g.transform.position = parent.transform.position;
-        PathComponent path = g.AddComponent<PathComponent>();
-        path.Init(color);
-        return path;
+        return g.AddComponent<PathComponent>().Init(color);
     }
 
     public static void DrawLineRend(LineRenderer lr, Vector3[] pnts)
