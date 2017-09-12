@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+// TODO
+// Put path into move object?? Somehow
+// Move command esque stuff away from path into move cmd
+
 // Primary Unit GUI, Controls State
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
 public class GuiUnit : MonoBehaviour
@@ -21,6 +25,7 @@ public class GuiUnit : MonoBehaviour
     private PathComponent mRGuide;
     private PathComponent mCGuide;
     private PathComponent mGapLine;
+    private PathComponent mMovePreview;
     private GameObject mStartGhost;
     private GameObject mEndGhost;
     private SimCmd mCmds;
@@ -54,6 +59,7 @@ public class GuiUnit : MonoBehaviour
         mRGuide = Draw.CreatePath(gameObject, "RightGuide", Color.yellow);
         mCGuide = Draw.CreatePath(gameObject, "CenterGuide", Color.green);
         mGapLine = Draw.CreatePath(gameObject, "GapLine", Color.blue);
+        mMovePreview = Draw.CreatePath(gameObject, "MovePreview", Color.red);
         EnableGuides(false);
         mCmds = new SimCmd();
 
@@ -169,13 +175,13 @@ public class GuiUnit : MonoBehaviour
 
     public void Retract()
     {
-        //mMoves[mMoves.Count - 1].Zero();
+        mMovePreview.Zero();
         mGapLine.Zero();
     }
 
     public void Stretch(Vector3[] pnts, Vector3 mouse)
     {
-        //mMoves[mMoves.Count - 1].RenderPoints = pnts;
+        mMovePreview.RenderPoints = pnts;
 
         Vector3[] gap = new Vector3[2];
         gap[0] = pnts[pnts.Length - 1];
@@ -213,7 +219,7 @@ public class GuiUnit : MonoBehaviour
 
         mCursorGhost.SetActive(true);
         mCursorGhost.GetComponent<SpriteRenderer>().color = Color.red - new Color(0, 0, 0, .7f);
-        MoveCmd curPath = null;
+        Path curPath = null;
 
         // Min Move Distance or Back Half
         if (Trig.GetHalf(dir, pnt, 0, 0) == Trig.Half.back
@@ -223,12 +229,12 @@ public class GuiUnit : MonoBehaviour
         else if(Trig.DistToLine(dir, pnt) < GameManager.MOVE_LINE_TOL
             || Vector2.Distance(dir.origin, Trig.NearestPointOnLine(dir, pnt)) < GameManager.MOVE_MIN_ARC_DIST)
         {
-            curPath = Draw.MakeLineMoveCmd(gameObject, dir, pnt, timeLeft);
+            curPath = new LinePath(timeLeft, dir, pnt);
         }
         // Else Arc
         else
         {
-            curPath = null; // TODO new ArcMoveCmd(timeLeft, dir, pnt);
+            curPath = new ArcPath(timeLeft, dir, pnt);
         }
 
         if(curPath != null)
@@ -252,7 +258,7 @@ public class GuiUnit : MonoBehaviour
         // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
-            mCmds.Add(curPath);
+            //mCmds.Add(curPath);
             //mGuiCmd.LockIn(mSimCmd.FinalDir);
 
             if(mCmds.TimeLeft < float.Epsilon)
