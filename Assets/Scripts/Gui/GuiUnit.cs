@@ -16,7 +16,7 @@ public class GuiUnit : MonoBehaviour
     private bool busy = false;
 
     // Static Objects
-    private GameObject mCursorGhost; // Ghost is unit dependent, doesn't have to be
+    private GameObject mCursorGhost;
     private PathComponent mLGuide;
     private PathComponent mRGuide;
     private PathComponent mCGuide;
@@ -28,7 +28,7 @@ public class GuiUnit : MonoBehaviour
     // Use this for initialization
     public void Start()
     {
-        // Setup selection
+        // Add Self Components
         SelectComponent s = gameObject.AddComponent<SelectComponent>();
         s.Init(GameManager.instance.mSelector);
         s.OnSelect = () =>
@@ -45,9 +45,11 @@ public class GuiUnit : MonoBehaviour
             return true;
         };
 
-        // Static Init TODO Make only render
+        // Make Cursor Ghost
         mCursorGhost = Draw.MakeGhost(gameObject);
         mCursorGhost.SetActive(false);
+
+        // Make Guides
         mLGuide = Draw.CreatePath(gameObject, "LeftGuide", Color.yellow);
         mRGuide = Draw.CreatePath(gameObject, "RightGuide", Color.yellow);
         mCGuide = Draw.CreatePath(gameObject, "CenterGuide", Color.green);
@@ -55,10 +57,12 @@ public class GuiUnit : MonoBehaviour
         EnableGuides(false);
         mCmds = new SimCmd();
 
+        // Make End-of-Turn Ghost
         mEndGhost = Draw.MakeGhost(gameObject);
         mEndGhost.GetComponent<SpriteRenderer>().color = Color.white;
         mEndGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(false);
 
+        // Make Start-of-turn Ghost
         mStartGhost = Draw.MakeGhost(gameObject);
         mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
         mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
@@ -73,9 +77,8 @@ public class GuiUnit : MonoBehaviour
             return true;
         };
 
-        // TODO StopGap
+        // Hook Together Components TODO StopGap
         mEndGhost.GetComponent<SelectComponent>().Init(mStartGhost.GetComponent<SelectComponent>());
-        MoveGuides(new Ray2D(transform.position, transform.up));
     }
 
     // Update is called once per frame
@@ -99,6 +102,8 @@ public class GuiUnit : MonoBehaviour
 
         mEndGhost.SetActive(false);
         mEndGhost.GetComponent<SpriteRenderer>().color = Color.white;
+
+        MoveGuides(new Ray2D(transform.position, transform.up));
     }
 
     public void ClickStart(bool reset)
