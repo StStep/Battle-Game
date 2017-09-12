@@ -75,6 +75,7 @@ public class GuiUnit : MonoBehaviour
 
         // TODO StopGap
         mEndGhost.GetComponent<SelectComponent>().Init(mStartGhost.GetComponent<SelectComponent>());
+        MoveGuides(new Ray2D(transform.position, transform.up));
     }
 
     // Update is called once per frame
@@ -113,9 +114,9 @@ public class GuiUnit : MonoBehaviour
 
     public void EnableGuides(bool en)
     {
-        mLGuide.enabled = en;
-        mRGuide.enabled = en;
-        mCGuide.enabled = en;
+        mLGuide.Active = en;
+        mRGuide.Active = en;
+        mCGuide.Active = en;
     }
 
     public bool SetMoving()

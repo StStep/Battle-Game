@@ -5,6 +5,12 @@ public class PathComponent : MonoBehaviour
 {
     LineRenderer mLr;
 
+    public bool Active
+    {
+        get { return mLr.enabled; }
+        set { mLr.enabled = value; }
+    }
+
     public void Awake()
     {
         mLr = gameObject.AddComponent<LineRenderer>();
