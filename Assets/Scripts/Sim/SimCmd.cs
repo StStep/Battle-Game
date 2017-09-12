@@ -6,49 +6,58 @@ using UnityEngine;
 public class SimCmd {
 
     // Dynamic Objects
-    List<ICommandSegment> mPaths;
+    List<ICommandSegment> mCmds;
 
-    float _timeSpent;
-    public float TimeSpent
+    public float Time()
     {
-        get { return _timeSpent; }
-        protected set { _timeSpent = value; }
+        float t = 0;
+        foreach(ICommandSegment s in mCmds)
+            t+= s.TimeDiff;
+        return t;
     }
 
     public float TimeLeft
     {
-        get { return GameManager.TIME_PER_TURN - TimeSpent; }
+        get { return GameManager.TIME_PER_TURN - Time(); }
         protected set { }
     }
 
-    public Ray2D FinalDir
+    public Ray2D FinalDir(Ray2D init)
     {
-        get { return new Ray2D(Last().End, Last().EndDir); }
-        protected set { }
+        Vector2 p = Vector2.zero;
+        float d = 0;
+
+        foreach (ICommandSegment s in mCmds)
+        {
+            p += s.PosDiff;
+            d += s.DirDiff;
+        }
+
+        return new Ray2D(init.origin + p, Quaternion.AngleAxis(d, Vector3.forward) * init.direction);
     }
 
     public SimCmd()
     {
-        mPaths = new List<ICommandSegment>();
-        TimeSpent = 0;
+        mCmds = new List<ICommandSegment>();
     }
 
-    public void Reset(Ray2D dir)
+    public void Reset()
     {
-        mPaths.Clear();
-        mPaths.Add(new PointPath(dir));
-        TimeSpent = 0;
+        foreach (ICommandSegment o in mCmds)
+        {
+            o.Remove();
+        }
+        mCmds.Clear();
     }
 
     public void Add(ICommandSegment seg)
     {
-        mPaths.Add(seg);
-        TimeSpent += seg.Time;
+        mCmds.Add(seg);
     }
 
     public ICommandSegment Last()
     {
-        return mPaths[mPaths.Count - 1];
+        return mCmds[mCmds.Count - 1];
     }
 
 }

@@ -16,6 +16,12 @@ public class PathComponent : MonoBehaviour
         mLr.positionCount = 0;
     }
 
+    public void Init(Color col)
+    {
+        mLr.startColor = col;
+        mLr.endColor = col;
+    }
+
     private Vector3[] _points;
     public Vector3[] RenderPoints
     {

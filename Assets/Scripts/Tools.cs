@@ -164,29 +164,14 @@ public static class Trig
 
 public static class Draw
 {
-    public static LineRenderer CreateLineRend(GameObject parent, String name, Color color)
-    {
-        GameObject myLine = new GameObject();
-        myLine.name = name;
-        myLine.transform.parent = parent.transform;
-        myLine.transform.position = parent.transform.position;
-        LineRenderer lr = myLine.AddComponent<LineRenderer>();
-        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-        lr.startColor = color;
-        lr.endColor = color;
-        lr.startWidth = 0.05f;
-        lr.endWidth = 0.05f;
-        lr.positionCount = 0;
-        return lr;
-    }
-
-    public static PathComponent CreatePathObject(GameObject parent)
+    public static PathComponent CreatePath(GameObject parent, String name, Color color)
     {
         GameObject g = new GameObject();
-        g.name = "Path";
+        g.name = name;
         g.transform.parent = parent.transform;
         g.transform.position = parent.transform.position;
         PathComponent path = g.AddComponent<PathComponent>();
+        path.Init(color);
         return path;
     }
 
@@ -219,6 +204,20 @@ public static class Draw
         g.AddComponent<SelectComponent>().Init(sel);
 
         return g;
+    }
+
+    public static MoveCmd MakeLineMoveCmd(GameObject par, Ray2D dir, Vector2 pnt, float time)
+    {
+        GameObject g = new GameObject();
+        g.name = "LineMoveCmd";
+        g.transform.parent = par.transform;
+        g.transform.localPosition = Vector3.zero + Vector3.back;
+        g.transform.localRotation = Quaternion.identity;
+
+        // Custom Component Init
+        MoveCmd ret = g.AddComponent<LineMoveCmd>().Init(pnt, time);
+        ret.Translate(dir);
+        return ret;
     }
 
 }

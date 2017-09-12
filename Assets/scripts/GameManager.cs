@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
         return g;
     }
 
-    private GameObject MakeUnit(GameObject par,string name, Vector2 pos, float rot)
+    private GameObject MakeUnit(GameObject par, string name, Vector2 pos, float rot)
     {
         GameObject g = new GameObject();
         g.name = name;
