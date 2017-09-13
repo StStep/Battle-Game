@@ -4,10 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// TODO
-// Add movement adjust hooks
-// Missing Time limit when clicking
-
 // Primary Unit GUI, Controls State
 [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
 public class GuiUnit : MonoBehaviour
