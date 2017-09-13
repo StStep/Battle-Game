@@ -11,12 +11,19 @@ public class MoveCmd : MonoBehaviour, ICommandSegment
     public void Awake()
     {
         mPathComp = gameObject.AddComponent<PathComponent>().Init(Color.red);
+        Sprite sp = Resources.Load<Sprite>("Sprites/Member");
+        if (sp == null)
+            throw new Exception("Failed to import sprite");
+        SpriteRenderer s = gameObject.AddComponent<SpriteRenderer>();
+        s.sprite = sp;
+        s.color = Color.red;
     }
 
     public MoveCmd Init(Path p)
     {
         mPath = p;
         mPathComp.RenderPoints = mPath.RenderPoints();
+        transform.position = mPath.End;
         return this;
     }
 
