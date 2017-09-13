@@ -204,7 +204,7 @@ public static class Draw
         return g;
     }
 
-    public static MoveCmd MakeMoveCmd(GameObject par, Path path)
+    public static MoveCmd MakeMoveCmd(GameObject par)
     {
         GameObject g = new GameObject();
         g.name = "LineMoveCmd";
@@ -212,7 +212,7 @@ public static class Draw
         g.transform.localPosition = Vector3.zero + Vector3.back;
         g.transform.localRotation = Quaternion.identity;
 
-        return g.AddComponent<MoveCmd>().Init(path);
+        return g.AddComponent<MoveCmd>();
     }
 
 }

@@ -82,9 +82,6 @@ public class GuiUnit : MonoBehaviour
             mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
             return true;
         };
-
-        // Hook Together Components TODO StopGap
-        mEndGhost.GetComponent<SelectComponent>().Init(mStartGhost.GetComponent<SelectComponent>());
     }
 
     // Update is called once per frame
@@ -190,6 +187,7 @@ public class GuiUnit : MonoBehaviour
 
     }
 
+    // Invoked for delay
     private void NotBusy()
     {
         busy = false;
@@ -259,7 +257,7 @@ public class GuiUnit : MonoBehaviour
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
             mEndGhost.SetActive(true);
-            mCmds.Add(Draw.MakeMoveCmd(gameObject, curPath));
+            mCmds.Add(Draw.MakeMoveCmd(gameObject).Init(curPath, null));
             MoveGuides(mCmds.FinalDir(new Ray2D(transform.position, transform.up)));
 
             if (mCmds.TimeLeft < float.Epsilon)
@@ -273,5 +271,10 @@ public class GuiUnit : MonoBehaviour
         }
     }
 
-#endregion
+    private void StAdjust()
+    {
+        ;
+    }
+
+    #endregion
 }

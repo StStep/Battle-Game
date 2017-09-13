@@ -10,6 +10,7 @@ public class MoveCmd : MonoBehaviour, ICommandSegment
 
     public void Awake()
     {
+        // Render Comonents
         mPathComp = gameObject.AddComponent<PathComponent>().Init(Color.red);
         Sprite sp = Resources.Load<Sprite>("Sprites/Member");
         if (sp == null)
@@ -17,13 +18,21 @@ public class MoveCmd : MonoBehaviour, ICommandSegment
         SpriteRenderer s = gameObject.AddComponent<SpriteRenderer>();
         s.sprite = sp;
         s.color = Color.red;
+
+        // Click Components
+        CircleCollider2D c = gameObject.AddComponent<CircleCollider2D>();
+        c.offset = Vector2.zero;
+        c.radius = 0.13f;
+        gameObject.AddComponent<ClickComponent>().Init();
     }
 
-    public MoveCmd Init(Path p)
+    public MoveCmd Init(Path p, ClickDel click)
     {
         mPath = p;
         mPathComp.RenderPoints = mPath.RenderPoints();
         transform.position = mPath.End;
+        transform.Rotate(Vector3.forward, Vector2.SignedAngle(transform.up, mPath.EndDir));
+        GetComponent<ClickComponent>().OnLeftClick = click;
         return this;
     }
 
