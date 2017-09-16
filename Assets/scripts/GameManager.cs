@@ -17,13 +17,29 @@ public class GameManager : MonoBehaviour
     public const float MOVE_MIN_PNT_DIST = 0.1f;
     public const float MOVE_MIN_ARC_DIST = 0.5f;
 
+    public enum MouseMode {Selecting, Moving};
+
 
     /// <summary>
     /// The single current instance of this class
     /// </summary>
     public static GameManager instance;
 
-    public SelectComponent mSelector = null;
+    public MouseMode mMouseMode = MouseMode.Selecting;
+
+    private SelectComponent _selector = null;
+    public SelectComponent Selected
+    {
+        get { return _selector; }
+        set
+        {
+            if(_selector != null)
+                _selector.Deselect();
+            _selector = value;
+            if(_selector != null)
+                _selector.Select();
+        }
+    }
 
     protected void Awake()
     {
@@ -39,8 +55,6 @@ public class GameManager : MonoBehaviour
 
         //Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
-
-        mSelector = gameObject.AddComponent<SelectComponent>();
 
         // Make Initial gamestate
         MakeBackground();
@@ -83,8 +97,18 @@ public class GameManager : MonoBehaviour
         g.transform.position = new Vector3(0, 0, 5);
         g.AddComponent<BoxCollider2D>().size = new Vector2(30, 30);
         ClickComponent c = g.AddComponent<ClickComponent>().Init();
-        c.OnLeftClick = () => instance.mSelector.ChainDeselect();
-        c.OnRightClick = () => instance.mSelector.ChainDeselect();
+        c.OnLeftClick = () =>
+        {
+            if (GameManager.instance.mMouseMode != GameManager.MouseMode.Selecting)
+                return;
+            Selected = null;
+        };
+        c.OnRightClick = () =>
+        {
+            if (GameManager.instance.mMouseMode != GameManager.MouseMode.Selecting)
+                return;
+            Selected = null;
+        };
 
         return g;
     }

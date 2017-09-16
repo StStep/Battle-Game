@@ -13,9 +13,9 @@ public class GuiUnit : MonoBehaviour
 
     // Status Member
     private State mState = State.None;
-    private bool busy = false;
 
     // Static Objects
+    private SelectComponent mSelComp;
     private GameObject mCursorGhost;
     private PathComponent mLGuide;
     private PathComponent mRGuide;
@@ -30,20 +30,16 @@ public class GuiUnit : MonoBehaviour
     public void Start()
     {
         // Add Self Components
-        SelectComponent s = gameObject.AddComponent<SelectComponent>();
-        s.Init(GameManager.instance.mSelector);
-        s.OnSelect = () =>
+        mSelComp = gameObject.AddComponent<SelectComponent>();
+        mSelComp.OnSelect = () =>
         {
+            mStartGhost.GetComponent<SpriteRenderer>().color = Color.yellow;
             EnableGuides(true);
-            return true;
         };
-        s.OnDeselect = () =>
+        mSelComp.OnDeselect = () =>
         {
-            if (busy)
-                return false;
-
+            mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
             EnableGuides(false);
-            return true;
         };
 
         // Make Cursor Ghost
@@ -68,16 +64,6 @@ public class GuiUnit : MonoBehaviour
         mStartGhost = Draw.MakeGhost(gameObject);
         mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
         mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
-        mStartGhost.GetComponent<SelectComponent>().OnSelect = () =>
-        {
-            mStartGhost.GetComponent<SpriteRenderer>().color = Color.yellow;
-            return true;
-        };
-        mStartGhost.GetComponent<SelectComponent>().OnDeselect = () =>
-        {
-            mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
-            return true;
-        };
     }
 
     // Update is called once per frame
@@ -107,8 +93,10 @@ public class GuiUnit : MonoBehaviour
 
     public void ClickStart(bool reset)
     {
-        if (!mStartGhost.GetComponent<SelectComponent>().ChainSelect())
+        if (GameManager.instance.mMouseMode != GameManager.MouseMode.Selecting)
             return;
+
+        GameManager.instance.Selected = mSelComp;
 
         if (reset)
             ResetCmds();
@@ -132,7 +120,7 @@ public class GuiUnit : MonoBehaviour
         if (mCmds.TimeLeft > float.Epsilon)
         {
             mState = State.Moving;
-            busy = true;
+            GameManager.instance.mMouseMode = GameManager.MouseMode.Moving;
             ret = true;
         }
 
@@ -186,7 +174,7 @@ public class GuiUnit : MonoBehaviour
     // Invoked for delay
     private void NotBusy()
     {
-        busy = false;
+        GameManager.instance.mMouseMode = GameManager.MouseMode.Selecting;
     }
 
     #endregion
