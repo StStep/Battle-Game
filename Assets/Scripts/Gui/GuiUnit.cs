@@ -64,6 +64,9 @@ public class GuiUnit : MonoBehaviour
         mStartGhost = Draw.MakeGhost(gameObject);
         mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
         mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
+
+        // Initial Guides placement
+        MoveGuides(new Ray2D(transform.position, transform.up));
     }
 
     // Update is called once per frame
@@ -93,15 +96,17 @@ public class GuiUnit : MonoBehaviour
 
     public void ClickStart(bool reset)
     {
-        if (GameManager.instance.mMouseMode != GameManager.MouseMode.Selecting)
-            return;
-
-        GameManager.instance.Selected = mSelComp;
-
-        if (reset)
-            ResetCmds();
-
-        SetMoving();
+        if(mSelComp.Selected)
+        {
+            if (reset)
+                ResetCmds();
+            SetMoving();
+        }
+        else
+        {
+            if (GameManager.instance.mMouseMode == GameManager.MouseMode.Selecting)
+                GameManager.instance.Selected = mSelComp;
+        }
     }
 
     public void EnableGuides(bool en)
