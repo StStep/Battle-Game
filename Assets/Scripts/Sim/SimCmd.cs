@@ -6,12 +6,12 @@ using UnityEngine;
 public class SimCmd {
 
     // Dynamic Objects
-    List<ICommandSegment> mCmds;
+    List<MoveCmd> mCmds;
 
     public float Time()
     {
         float t = 0;
-        foreach(ICommandSegment s in mCmds)
+        foreach(MoveCmd s in mCmds)
             t+= s.TimeDiff;
         return t;
     }
@@ -27,7 +27,7 @@ public class SimCmd {
         Vector2 p = Vector2.zero;
         float d = 0;
 
-        foreach (ICommandSegment s in mCmds)
+        foreach (MoveCmd s in mCmds)
         {
             p += s.PosDiff;
             d += s.DirDiff;
@@ -38,26 +38,26 @@ public class SimCmd {
 
     public SimCmd()
     {
-        mCmds = new List<ICommandSegment>();
+        mCmds = new List<MoveCmd>();
     }
 
     public void Reset()
     {
-        foreach (ICommandSegment o in mCmds)
+        foreach (MoveCmd o in mCmds)
         {
             o.Remove();
         }
         mCmds.Clear();
     }
 
-    public void Add(ICommandSegment seg)
+    public void Add(MoveCmd seg)
     {
         mCmds.Add(seg);
     }
 
-    public ICommandSegment Last()
+    public MoveCmd Last()
     {
-        return mCmds[mCmds.Count - 1];
+        return (mCmds.Count != 0) ? mCmds[mCmds.Count - 1] : null;
     }
 
 }

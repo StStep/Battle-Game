@@ -23,7 +23,7 @@ public class GuiUnit : MonoBehaviour
     private PathComponent mMovePreview;
     private GameObject mStartMarker;
     private GameObject mEndGhost;
-    private SimCmd mCmds;
+    private SimCmd mCmds; // TODO Make an export for this, into ICommandSegment
 
     // Use this for initialization
     public void Start()
@@ -251,7 +251,10 @@ public class GuiUnit : MonoBehaviour
         // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
+            if(mCmds.Last())
+                mCmds.Last().Hide(false);
             mCmds.Add(Draw.MakeMoveCmd(gameObject).Init(curPath, null));
+            mCmds.Last().Hide(true);
             MoveGuides(mCmds.FinalDir(new Ray2D(transform.position, transform.up)));
             mStartMarker.SetActive(true);
 

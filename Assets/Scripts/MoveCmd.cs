@@ -7,6 +7,8 @@ public class MoveCmd : MonoBehaviour, ICommandSegment
 {
     private Path mPath;
     private PathComponent mPathComp;
+    private SpriteRenderer mSpRender;
+    private CircleCollider2D mCollider;
 
     public void Awake()
     {
@@ -15,14 +17,14 @@ public class MoveCmd : MonoBehaviour, ICommandSegment
         Sprite sp = Resources.Load<Sprite>("Sprites/Member");
         if (sp == null)
             throw new Exception("Failed to import sprite");
-        SpriteRenderer s = gameObject.AddComponent<SpriteRenderer>();
-        s.sprite = sp;
-        s.color = Color.red;
+        mSpRender = gameObject.AddComponent<SpriteRenderer>();
+        mSpRender.sprite = sp;
+        mSpRender.color = Color.red;
 
         // Click Components
-        CircleCollider2D c = gameObject.AddComponent<CircleCollider2D>();
-        c.offset = Vector2.zero;
-        c.radius = 0.13f;
+        mCollider = gameObject.AddComponent<CircleCollider2D>();
+        mCollider.offset = Vector2.zero;
+        mCollider.radius = 0.13f;
         gameObject.AddComponent<ClickComponent>().Init();
     }
 
@@ -34,6 +36,12 @@ public class MoveCmd : MonoBehaviour, ICommandSegment
         transform.Rotate(Vector3.forward, Vector2.SignedAngle(transform.up, mPath.EndDir));
         GetComponent<ClickComponent>().OnLeftClick = click;
         return this;
+    }
+
+    public void Hide(bool b)
+    {
+        mSpRender.enabled = !b;
+        mCollider.enabled = !b;
     }
 
     #region ICommandSegment
