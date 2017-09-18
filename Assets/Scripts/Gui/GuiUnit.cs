@@ -33,10 +33,12 @@ public class GuiUnit : MonoBehaviour
         mSelComp.OnSelect = () =>
         {
             mStartMarker.GetComponent<SpriteRenderer>().color = Color.yellow;
+            mCmds.ShowAllButLast(true);
         };
         mSelComp.OnDeselect = () =>
         {
             mStartMarker.GetComponent<SpriteRenderer>().color = Color.blue;
+            mCmds.ShowAllButLast(false);
         };
 
         // Make Cursor Ghost

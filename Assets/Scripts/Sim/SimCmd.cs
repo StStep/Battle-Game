@@ -60,4 +60,15 @@ public class SimCmd {
         return (mCmds.Count != 0) ? mCmds[mCmds.Count - 1] : null;
     }
 
+    public void ShowAllButLast(bool b)
+    {
+        for(int i = 0; i < mCmds.Count - 1; i++)
+        {
+            mCmds[i].Hide(!b);
+        }
+
+        if(Last())
+            Last().Hide(true);
+    }
+
 }
