@@ -34,12 +34,10 @@ public class GuiUnit : MonoBehaviour
         mSelComp.OnSelect = () =>
         {
             mStartGhost.GetComponent<SpriteRenderer>().color = Color.yellow;
-            EnableGuides(true);
         };
         mSelComp.OnDeselect = () =>
         {
             mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
-            EnableGuides(false);
         };
 
         // Make Cursor Ghost
@@ -100,7 +98,9 @@ public class GuiUnit : MonoBehaviour
         {
             if (reset)
                 ResetCmds();
-            SetMoving();
+
+            if (mState == State.None && mCmds.TimeLeft > float.Epsilon)
+                StartStMove();
         }
         else
         {
@@ -114,22 +114,6 @@ public class GuiUnit : MonoBehaviour
         mLGuide.Active = en;
         mRGuide.Active = en;
         mCGuide.Active = en;
-    }
-
-    public bool SetMoving()
-    {
-        if (mState != State.None)
-            return false;
-
-        bool ret = false;
-        if (mCmds.TimeLeft > float.Epsilon)
-        {
-            mState = State.Moving;
-            GameManager.instance.mMouseMode = GameManager.MouseMode.Moving;
-            ret = true;
-        }
-
-        return ret;
     }
 
     private void MoveGuides(Ray2D dir)
@@ -177,7 +161,7 @@ public class GuiUnit : MonoBehaviour
     }
 
     // Invoked for delay
-    private void NotBusy()
+    private void ClearMouseMode()
     {
         GameManager.instance.mMouseMode = GameManager.MouseMode.Selecting;
     }
@@ -186,15 +170,28 @@ public class GuiUnit : MonoBehaviour
 
     #region States
 
+    private void StartStMove()
+    {
+        mState = State.Moving;
+        EnableGuides(true);
+        GameManager.instance.mMouseMode = GameManager.MouseMode.Moving;
+    }
+
+    private void EndStMove()
+    {
+        Retract();
+        mCursorGhost.SetActive(false);
+        EnableGuides(false);
+        Invoke("ClearMouseMode", .2f); //Clear MouseMode with delay
+        mState = State.None;
+    }
+
     private void StMove()
     {
         // If right Click exit state
         if (Input.GetMouseButtonDown(1))
         {
-            mState = State.None;
-            Retract();
-            mCursorGhost.SetActive(false);
-            Invoke("NotBusy", .2f);
+            EndStMove();
             return;
         }
 
@@ -252,10 +249,7 @@ public class GuiUnit : MonoBehaviour
             if (mCmds.TimeLeft < float.Epsilon)
             {
                 Fin();
-                mState = State.None;
-                Invoke("NotBusy", .2f);
-                Retract();
-                mCursorGhost.SetActive(false);
+                EndStMove();
             }
         }
     }
