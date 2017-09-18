@@ -122,11 +122,6 @@ public class GameManager : MonoBehaviour
         g.transform.localRotation = Quaternion.identity;
         g.transform.position = new Vector3(pos.x, pos.y, 0);
         g.transform.rotation = Quaternion.AngleAxis(rot, Vector3.forward);
-        g.AddComponent<BoxCollider2D>().size = new Vector2(1.357859f, 0.6493425f);
-        Sprite sp = Resources.Load<Sprite>("Sprites/Unit_Arr");
-        if (sp == null)
-            throw new Exception("Failed to import sprite");
-        g.AddComponent<SpriteRenderer>().sprite = sp;
         g.AddComponent<GuiUnit>();
 
         return g;

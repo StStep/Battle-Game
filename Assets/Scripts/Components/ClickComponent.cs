@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public delegate void ClickDel();
 
-[RequireComponent(typeof(Collider2D))]
 public class ClickComponent : MonoBehaviour
 {
     public ClickDel OnRightClick = null;

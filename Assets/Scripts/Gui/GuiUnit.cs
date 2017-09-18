@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 // Primary Unit GUI, Controls State
-[RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
 public class GuiUnit : MonoBehaviour
 {
     // Types
@@ -22,7 +21,7 @@ public class GuiUnit : MonoBehaviour
     private PathComponent mCGuide;
     private PathComponent mGapLine;
     private PathComponent mMovePreview;
-    private GameObject mStartGhost;
+    private GameObject mStartMarker;
     private GameObject mEndGhost;
     private SimCmd mCmds;
 
@@ -33,11 +32,11 @@ public class GuiUnit : MonoBehaviour
         mSelComp = gameObject.AddComponent<SelectComponent>();
         mSelComp.OnSelect = () =>
         {
-            mStartGhost.GetComponent<SpriteRenderer>().color = Color.yellow;
+            mStartMarker.GetComponent<SpriteRenderer>().color = Color.yellow;
         };
         mSelComp.OnDeselect = () =>
         {
-            mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
+            mStartMarker.GetComponent<SpriteRenderer>().color = Color.blue;
         };
 
         // Make Cursor Ghost
@@ -58,13 +57,23 @@ public class GuiUnit : MonoBehaviour
         mEndGhost.GetComponent<SpriteRenderer>().color = Color.white;
         mEndGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(false);
 
-        // Make Start-of-turn Ghost
-        mStartGhost = Draw.MakeGhost(gameObject);
-        mStartGhost.GetComponent<SpriteRenderer>().color = Color.blue;
-        mStartGhost.GetComponent<ClickComponent>().OnLeftClick = () => ClickStart(true);
+        // Make Start-of-turn Marker
+        mStartMarker = new GameObject();
+        mStartMarker.name = "StartMarker";
+        mStartMarker.transform.parent = gameObject.transform;
+        mStartMarker.transform.localPosition = Vector3.zero + Vector3.back;
+        mStartMarker.transform.localRotation = Quaternion.identity;
+        Sprite sp = Resources.Load<Sprite>("Sprites/Member");
+        if (sp == null)
+            throw new Exception("Failed to import sprite");
+        mStartMarker.AddComponent<SpriteRenderer>().sprite = sp;
+        CircleCollider2D c = mStartMarker.AddComponent<CircleCollider2D>();
+        c.offset = Vector2.zero;
+        c.radius = 0.13f;
+        mStartMarker.AddComponent<ClickComponent>().Init().OnLeftClick = () => ClickStart(true);
 
-        // Initial Guides placement
-        MoveGuides(new Ray2D(transform.position, transform.up));
+        // Initial Cmds
+        ResetCmds();
     }
 
     // Update is called once per frame
@@ -86,8 +95,8 @@ public class GuiUnit : MonoBehaviour
     {
         mCmds.Reset();
 
-        mEndGhost.SetActive(false);
         mEndGhost.GetComponent<SpriteRenderer>().color = Color.white;
+        mStartMarker.SetActive(false);
 
         MoveGuides(new Ray2D(transform.position, transform.up));
     }
@@ -242,9 +251,9 @@ public class GuiUnit : MonoBehaviour
         // If left Click and Path, Add Movement Segment
         if (curPath != null && Input.GetMouseButtonDown(0))
         {
-            mEndGhost.SetActive(true);
             mCmds.Add(Draw.MakeMoveCmd(gameObject).Init(curPath, null));
             MoveGuides(mCmds.FinalDir(new Ray2D(transform.position, transform.up)));
+            mStartMarker.SetActive(true);
 
             if (mCmds.TimeLeft < float.Epsilon)
             {

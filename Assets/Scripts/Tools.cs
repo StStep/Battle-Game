@@ -188,16 +188,16 @@ public static class Draw
         g.transform.localPosition = Vector3.zero + Vector3.back;
         g.transform.localRotation = Quaternion.identity;
 
-        // Get parent stuff
-        Vector2 size = par.GetComponent<BoxCollider2D>().size;
-        Sprite sprite = par.GetComponent<SpriteRenderer>().sprite;
-
         // Box Collider Init
-        g.AddComponent<BoxCollider2D>().size = size;
+        g.AddComponent<BoxCollider2D>().size = new Vector2(1.357859f, 0.6493425f);
 
         // Custom Component Init
         g.AddComponent<ClickComponent>().Init();
-        g.AddComponent<SpriteRenderer>().sprite = sprite;
+        Sprite sp = Resources.Load<Sprite>("Sprites/Unit_Arr");
+        if (sp == null)
+            throw new Exception("Failed to import sprite");
+        g.AddComponent<SpriteRenderer>().sprite = sp;
+
 
         return g;
     }
